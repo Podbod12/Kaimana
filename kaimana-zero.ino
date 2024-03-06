@@ -107,7 +107,7 @@ void setLEDRandomColor(int index)
 }
 
 //See if an attack button is held, record it and set a random colour for that button if newly pressed
-bool checkButtonPressedAndSetRandomColourIfSo(int pin, int led)
+bool checkButtonPressedAndSetNewColourIfSo(int pin, int led)
 {
   bool bHeld = digitalRead(pin) == BUTTON_READ_CHECK;
   
@@ -124,15 +124,26 @@ bool checkButtonPressedAndSetRandomColourIfSo(int pin, int led)
       }
       else
       {
-        // select new color when switch is first activated      
-        setLEDRandomColor(led);
+        // select new color when switch is first activated
+        if(USE_STATIC_COLOUR_WHEN_PRESSED)
+        {
+          kaimana.setLED(led, PRESSED_STATIC_COLOUR);
+        }      
+        else //random colour
+        {
+          setLEDRandomColor(led);
+        }
         iLED[led] = true;
       }
     }
     else
     {
         // switch is inactive
-        kaimana.setLED(led, BLACK);
+        if(TURN_NON_HELD_BUTTONS_OFF || USE_STATIC_COLOUR_IN_IDLE == false)
+          kaimana.setLED(led, BLACK);
+        else
+          kaimana.setLED(led, IDLE_STATIC_COLOUR);
+      
         iLED[led] = false;
     }
   }
@@ -217,10 +228,10 @@ void updateMovementHeldDirections()
   }
 
   //Check for button down and set rgb colour
-  checkButtonPressedAndSetRandomColourIfSo(PIN_UP, LED_UP);
-  checkButtonPressedAndSetRandomColourIfSo(PIN_LEFT, LED_LEFT);
-  checkButtonPressedAndSetRandomColourIfSo(PIN_RIGHT, LED_RIGHT);
-  checkButtonPressedAndSetRandomColourIfSo(PIN_DOWN, LED_DOWN);
+  checkButtonPressedAndSetNewColourIfSo(PIN_UP, LED_UP);
+  checkButtonPressedAndSetNewColourIfSo(PIN_LEFT, LED_LEFT);
+  checkButtonPressedAndSetNewColourIfSo(PIN_RIGHT, LED_RIGHT);
+  checkButtonPressedAndSetNewColourIfSo(PIN_DOWN, LED_DOWN);
 
   //if using joystick pcb diagonals then now remove the 4 unneeded lights
   if(bUpdateJoystickDiagonals && (joystickThisFrame == EIT_Input_UpLeft || joystickThisFrame == EIT_Input_UpRight || joystickThisFrame == EIT_Input_DownLeft || joystickThisFrame == EIT_Input_DownRight))
@@ -369,24 +380,24 @@ int pollSwitches(void)
   // test switchs and set LED based on result    
   kaimana.switchHistoryBeginFrame();
 
-  checkButtonPressedAndSetRandomColourIfSo(PIN_SELECT, LED_SELECT);// SELECT = BACK
-  checkButtonPressedAndSetRandomColourIfSo(PIN_START, LED_START);
+  checkButtonPressedAndSetNewColourIfSo(PIN_SELECT, LED_SELECT);// SELECT = BACK
+  checkButtonPressedAndSetNewColourIfSo(PIN_START, LED_START);
  
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P1, LED_P1))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P1, LED_P1))
       kaimana.switchHistorySet(EIT_Input_P1);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P2, LED_P2))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P2, LED_P2))
       kaimana.switchHistorySet(EIT_Input_P2);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P3, LED_P3))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P3, LED_P3))
       kaimana.switchHistorySet(EIT_Input_P3);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P4, LED_P4))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P4, LED_P4))
       kaimana.switchHistorySet(EIT_Input_P4);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K1, LED_K1))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K1, LED_K1))
       kaimana.switchHistorySet(EIT_Input_K1);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K2, LED_K2))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K2, LED_K2))
       kaimana.switchHistorySet(EIT_Input_K2);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K3, LED_K3))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K3, LED_K3))
       kaimana.switchHistorySet(EIT_Input_K3);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K4, LED_K4))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K4, LED_K4))
       kaimana.switchHistorySet(EIT_Input_K4);
 
   updateMovementHeldDirections();

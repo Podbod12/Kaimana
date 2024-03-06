@@ -57,7 +57,12 @@
 #define  MIN_LED_UPDATE_DELAY       5    // value in miliseconds - Gives kaimana/leds time to update correctly - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  T_DELAY      			  250    
 
-
+//Idle and press settings
+#define USE_STATIC_COLOUR_IN_IDLE false
+#define IDLE_STATIC_COLOUR RED
+#define TURN_NON_HELD_BUTTONS_OFF true //This is only used if you've set USE_STATIC_COLOUR_IN_IDLE to true. other wise it will always turn them off.
+#define USE_STATIC_COLOUR_WHEN_PRESSED false
+#define PRESSED_STATIC_COLOUR BLUE
 
 // definitions of RGB values use by random color generator: setLEDRandomColor(int)
 #define  COLOR_RANDOM_1    127,220,000    // lime green

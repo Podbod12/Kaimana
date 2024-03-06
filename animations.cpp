@@ -61,22 +61,33 @@ int animation_idle(void)
   int  i;
 
   // set initial color to BLACK
-  kaimana.setALL(BLACK);
+  if(TURN_NON_HELD_BUTTONS_OFF || USE_STATIC_COLOUR_IN_IDLE == false)
+  {
+    kaimana.setALL(BLACK);
+  }
+
   delay( MIN_LED_UPDATE_DELAY ); // give leds time to update
 
   while(true)
   {
     for(index=0;index<IDLE_SIZE;++index)
     {
-      // update strip with new color2
+      // update strip with new color
       for(i=0;i<LED_COUNT;++i)
       {
-        kaimana.setLED(
-          i,
-          pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-          pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-          pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
-        );
+        if(USE_STATIC_COLOUR_IN_IDLE)
+        {
+          kaimana.setLED(i, IDLE_STATIC_COLOUR);    
+        }
+        else //cycle rgb
+        {
+          kaimana.setLED(
+            i,
+            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
+          );
+        }
       }
 
       // update the leds with new/current colors in the array
