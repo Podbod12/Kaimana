@@ -57,8 +57,6 @@
 #define  MIN_LED_UPDATE_DELAY       5    // value in miliseconds - Gives kaimana/leds time to update correctly - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  T_DELAY      			  250    
 
-
-
 // definitions of RGB values use by random color generator: setLEDRandomColor(int)
 #define  COLOR_RANDOM_1    127,220,000    // lime green
 #define  COLOR_RANDOM_2    127,000,220    // purple

@@ -34,7 +34,7 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Gief::testForCharacterCombos()
+void Gief::testForCharacterCombos() const
 {
   EInputTypes P1Array[] = {EIT_Input_P1};
   EInputTypes P2Array[] = {EIT_Input_P2};
@@ -71,7 +71,9 @@ void Gief::testForCharacterCombos()
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ))
+  {
     Circle_OneColour_Combo_Animation(4, RED);  
+  }
 
   
   //AerialSlam (both sides)
@@ -92,20 +94,21 @@ void Gief::testForCharacterCombos()
       kaimana.switchHistoryTest( {}, 0, P1P2Array, 2, false ) ||
       kaimana.switchHistoryTest( {}, 0, P1P3Array, 2, false ) ||
       kaimana.switchHistoryTest( {}, 0, P2P3Array, 2, false ) )
+  {
     KnightRider_Combo_Animation(2, true, RED);  
+  }
 
 
-  //bear grab to the right
+  //bear grab (both sides)
   if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
-      kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
-    Circle_OneColour_Combo_Animation(2, GOLD);  
-
-  //bear grab to the left
-  if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
+      kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) ||
+      kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
+  {
     Circle_OneColour_Combo_Animation(2, GOLD);  
+  }
 
 
   //piledriver 

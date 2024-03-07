@@ -24,6 +24,7 @@
 //  Revised:  October 29, 2013    zonbipanda // gmail.com
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
+//  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
 //
 
 #ifndef __kaimana_h__
@@ -102,7 +103,7 @@ enum EInputTypes
 #define  WHITE    255,255,255
 #define  ORANGE   220,127,0
 #define  GOLD     255,150,0
-
+#define  BROWN    240,230,140
 
 // RGB value structure.
 typedef struct __attribute__ ((__packed__)) {
@@ -151,7 +152,7 @@ class Kaimana
     void    switchHistoryBeginFrame(void);
     void    switchHistorySet(EInputTypes latestValue);
     void    switchHistoryEndFrame(void);
-    boolean switchHistoryTest(EInputTypes* moveArray, int moveLength, EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo);
+    boolean switchHistoryTest(const EInputTypes* moveArray, int moveLength, const EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo);
 };
 
 

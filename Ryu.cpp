@@ -34,7 +34,7 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Ryu::testForCharacterCombos()
+void Ryu::testForCharacterCombos() const
 {
   EInputTypes P1Array[] = {EIT_Input_P1};
   EInputTypes P2Array[] = {EIT_Input_P2};
@@ -43,17 +43,16 @@ void Ryu::testForCharacterCombos()
   EInputTypes K2Array[] = {EIT_Input_K2};
   EInputTypes K3Array[] = {EIT_Input_K3};
 
-  //Super Dragon punch right
+  //Super Dragon punch (both sides)
   if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
-      kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ))
-    FlashAllSpeedIncreasing_Combo_Animation(WHITE);
-  
-  //Super Dragon punch left
-  if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
+      kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ) ||
+      kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ))
+  {
     FlashAllSpeedIncreasing_Combo_Animation(WHITE);
+  }
   
   //Super fireball right
   if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) ||

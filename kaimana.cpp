@@ -24,6 +24,7 @@
 //  Revised:  October 29, 2013    zonbipanda // gmail.com
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
+//  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
 //
 
 #define __PROG_TYPES_COMPAT__
@@ -339,7 +340,7 @@ bool doesInputMatch(EInputTypes historyInput, EInputTypes comboInput, bool bIsCh
 }
 
 //todo : This is still a night mare for 360's and 720's. Need to add some kind of percentage of inputs hit or something. (like a rolling 2 out of 4 for any inputs over 6 inputs long
-boolean Kaimana::switchHistoryTest(EInputTypes* moveArray, int moveLength, EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo)
+boolean Kaimana::switchHistoryTest(const EInputTypes* moveArray, int moveLength, const EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo)
 {
   int lastIndexComboInputWasFound = -1;
   bool bHasFinishedDoingTriggerButtons = false;
