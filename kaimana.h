@@ -24,6 +24,7 @@
 //  Revised:  October 29, 2013    zonbipanda // gmail.com
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
+//  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
 //
 
 #ifndef __kaimana_h__
@@ -88,7 +89,7 @@ enum EInputTypes
 #define  SWITCH_COUNT         15
 
 // This should be plenty. double 360 would need 17. So double that for safety
-#define SWITCH_HISTORY_MAX  36
+#define SWITCH_HISTORY_MAX  24
 
 // basic color definitions with various R,G,B values
 // generic (may  want to prefix with COLOR_* to localize further)
@@ -102,7 +103,8 @@ enum EInputTypes
 #define  WHITE    255,255,255
 #define  ORANGE   220,127,0
 #define  GOLD     255,150,0
-
+#define  BROWN    240,230,140
+#define  GREY     127,127,127
 
 // RGB value structure.
 typedef struct __attribute__ ((__packed__)) {
@@ -118,6 +120,16 @@ typedef struct __attribute__ ((__packed__)) {
     unsigned long TimeReleased;
     bool bIsHeld;
 } InputHistory;
+
+// Input Blend structure.
+typedef struct __attribute__ ((__packed__)) {
+    unsigned long TimeSet;
+    int TimeToHold;
+    int TimeToBlend;
+    uint8_t LEDPin;
+    RGB_t SourceCol;
+    RGB_t DestCol;
+} LEDBlend;
 
 // table of switch pin numbers
 const unsigned char switchPins[SWITCH_COUNT] = { PIN_DOWN, PIN_UP, PIN_LEFT, PIN_RIGHT, PIN_HOME, PIN_SELECT, PIN_START, PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4 };
@@ -137,13 +149,15 @@ class Kaimana
     bool _InputsThisFrame[EIT_INPUT_MAX];
     bool _switchClearAwaitingAllRelease = false;
     unsigned long _timeAtBeginningOfFrame = 0;
+    LEDBlend _ledBlend[LED_ENTRIES];
 
     //Helper functions
     void switchHistoryCreateNew(EInputTypes newValue);
  
  public:
     Kaimana(void);
-    void    setLED(int index, int iR, int iG, int iB);
+    void    blendLEDs(void);
+    void    setLED(int index, int iR, int iG, int iB, bool bIsBlend = false, int holdTime = 0, int fadeTime = 0);
     void    setIndividualLED(int index, int iR, int iG, int iB);
     void    setALL(int iR, int iG, int iB);
     void    updateALL(void);
@@ -151,7 +165,7 @@ class Kaimana
     void    switchHistoryBeginFrame(void);
     void    switchHistorySet(EInputTypes latestValue);
     void    switchHistoryEndFrame(void);
-    boolean switchHistoryTest(EInputTypes* moveArray, int moveLength, EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo);
+    boolean switchHistoryTest(const EInputTypes* moveArray, int moveLength, const EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo);
 };
 
 

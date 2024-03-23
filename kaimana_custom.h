@@ -47,6 +47,9 @@
   #define  LED_COUNT   48
 #endif
 
+#define  LED_ENTRIES         12 // should match the unique entries above (and thus array size below)
+const unsigned char ledList[LED_ENTRIES] = { LED_P4, LED_P3, LED_P2, LED_P1, LED_K1, LED_K2, LED_K3, LED_K4, LED_UP, LED_DOWN, LED_LEFT, LED_RIGHT};
+
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
 #define  BOOT_COLOR_DELAY         200    // value in miliseconds
@@ -56,8 +59,6 @@
 #define  IDLE_ANIMATION_DELAY       5    // value in miliseconds - use smaller value for faster idle animation playback - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  MIN_LED_UPDATE_DELAY       5    // value in miliseconds - Gives kaimana/leds time to update correctly - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  T_DELAY      			  250    
-
-
 
 // definitions of RGB values use by random color generator: setLEDRandomColor(int)
 #define  COLOR_RANDOM_1    127,220,000    // lime green

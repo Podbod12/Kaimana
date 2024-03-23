@@ -16,7 +16,7 @@ boolean tournamentMode = false;
 int holdTimeout = 0;
 
 //global state of all LED inputs being on or off (todo : wasteful, look into new way to store this or share with input history)
-int iLED[LED_COUNT];
+bool iLED[LED_COUNT];
 
 // ParadiseArcadeShop.com Kaimana features initialzied when Kaimana class instantiated
 Kaimana kaimana;
@@ -35,7 +35,7 @@ Dhalsim sim;
 //Marisa marisa;
 
 const Character* AllCharacters[NUM_CHARACTERS] = { &ryu, &honda, &blanka, &guile, &ken, &chun, &gief, &sim };
-int selectedCharacter = 0;
+int8_t selectedCharacter = 0;
 
 // ==============================================================
 //
@@ -75,7 +75,11 @@ void loop()
 				// no switches active so test for start of idle timeout  
 				if( millis() > ulTimeout )
 				{
-				  animation_idle();
+				  animation_idle(AllCharacters[selectedCharacter]);
+
+          //Force set black when exiting idle (if applicable)
+          if(AllCharacters[selectedCharacter]->turnNonHeldButtonsOff() || AllCharacters[selectedCharacter]->useStaticColourInIdle() == false)
+            kaimana.setALL(BLACK);
 				}  
 			}
 		}
@@ -107,7 +111,7 @@ void setLEDRandomColor(int index)
 }
 
 //See if an attack button is held, record it and set a random colour for that button if newly pressed
-bool checkButtonPressedAndSetRandomColourIfSo(int pin, int led)
+bool checkButtonPressedAndSetNewColourIfSo(int pin, int led)
 {
   bool bHeld = digitalRead(pin) == BUTTON_READ_CHECK;
   
@@ -124,15 +128,30 @@ bool checkButtonPressedAndSetRandomColourIfSo(int pin, int led)
       }
       else
       {
-        // select new color when switch is first activated      
-        setLEDRandomColor(led);
+        // select new color when switch is first activated
+        if(AllCharacters[selectedCharacter]->useStaticColourWhenPressed())
+        {
+          RGB_t thisCol = AllCharacters[selectedCharacter]->pressedStaticColour();
+          kaimana.setLED(led, thisCol.r, thisCol.g, thisCol.b);
+        }      
+        else //random colour
+        {
+          setLEDRandomColor(led);
+        }
         iLED[led] = true;
       }
     }
     else
     {
         // switch is inactive
-        kaimana.setLED(led, BLACK);
+        if(AllCharacters[selectedCharacter]->turnNonHeldButtonsOff() || AllCharacters[selectedCharacter]->useStaticColourInIdle() == false)
+          kaimana.setLED(led, BLACK, false, AllCharacters[selectedCharacter]->holdPressedButtonColourTimeInMS(),  AllCharacters[selectedCharacter]->fadePressedButtonColourTimeInMS());
+        else
+        {
+          RGB_t thisCol = AllCharacters[selectedCharacter]->idleStaticColour();
+          kaimana.setLED(led, thisCol.r, thisCol.g, thisCol.b, false, AllCharacters[selectedCharacter]->holdPressedButtonColourTimeInMS(),  AllCharacters[selectedCharacter]->fadePressedButtonColourTimeInMS());
+        }
+      
         iLED[led] = false;
     }
   }
@@ -203,32 +222,53 @@ void updateMovementHeldDirections()
     }
   }
 
+  boolean bResetToBlack = false;
+  if(AllCharacters[selectedCharacter]->turnNonHeldButtonsOff() || AllCharacters[selectedCharacter]->useStaticColourInIdle() == false)
+    bResetToBlack = true;
+
   //if using joystick pcb diagonals and it changes then we need to reset all directional lights
   if(bUpdateJoystickDiagonals)
   {
-    kaimana.setLED(LED_UP, BLACK);
-    iLED[LED_UP] = false;
-    kaimana.setLED(LED_LEFT, BLACK);
-    iLED[LED_LEFT] = false;
-    kaimana.setLED(LED_RIGHT, BLACK);
-    iLED[LED_RIGHT] = false;
-    kaimana.setLED(LED_DOWN, BLACK);
-    iLED[LED_DOWN] = false;
+    RGB_t thisCol = AllCharacters[selectedCharacter]->idleStaticColour();
+
+    int ledArray[] = {LED_UP, LED_LEFT, LED_RIGHT, LED_DOWN};
+    for(int index = 0; index < 4; ++index)
+    {
+      if(bResetToBlack)
+        kaimana.setLED(ledArray[index], BLACK);
+      else
+        kaimana.setLED(ledArray[index], thisCol.r, thisCol.g, thisCol.b);
+      iLED[ledArray[index]] = false;
+    }
   }
 
   //Check for button down and set rgb colour
-  checkButtonPressedAndSetRandomColourIfSo(PIN_UP, LED_UP);
-  checkButtonPressedAndSetRandomColourIfSo(PIN_LEFT, LED_LEFT);
-  checkButtonPressedAndSetRandomColourIfSo(PIN_RIGHT, LED_RIGHT);
-  checkButtonPressedAndSetRandomColourIfSo(PIN_DOWN, LED_DOWN);
+  checkButtonPressedAndSetNewColourIfSo(PIN_UP, LED_UP);
+  checkButtonPressedAndSetNewColourIfSo(PIN_LEFT, LED_LEFT);
+  checkButtonPressedAndSetNewColourIfSo(PIN_RIGHT, LED_RIGHT);
+  checkButtonPressedAndSetNewColourIfSo(PIN_DOWN, LED_DOWN);
 
   //if using joystick pcb diagonals then now remove the 4 unneeded lights
   if(bUpdateJoystickDiagonals && (joystickThisFrame == EIT_Input_UpLeft || joystickThisFrame == EIT_Input_UpRight || joystickThisFrame == EIT_Input_DownLeft || joystickThisFrame == EIT_Input_DownRight))
   {
-    kaimana.setIndividualLED(firstDirection, BLACK);
-    kaimana.setIndividualLED(firstDirection+1, BLACK);  
-    kaimana.setIndividualLED(secondDirection+2, BLACK);
-    kaimana.setIndividualLED(secondDirection+3, BLACK);
+    RGB_t thisCol = AllCharacters[selectedCharacter]->idleStaticColour();
+    
+    if(bResetToBlack)
+      kaimana.setIndividualLED(firstDirection, BLACK);
+    else
+      kaimana.setIndividualLED(firstDirection, thisCol.r, thisCol.g, thisCol.b);
+    if(bResetToBlack)
+      kaimana.setIndividualLED(firstDirection+1, BLACK);
+    else
+      kaimana.setIndividualLED(firstDirection+1, thisCol.r, thisCol.g, thisCol.b);
+    if(bResetToBlack)
+      kaimana.setIndividualLED(secondDirection+2, BLACK);
+    else
+      kaimana.setIndividualLED(secondDirection+2, thisCol.r, thisCol.g, thisCol.b);
+    if(bResetToBlack)
+      kaimana.setIndividualLED(secondDirection+3, BLACK);
+    else
+      kaimana.setIndividualLED(secondDirection+3, thisCol.r, thisCol.g, thisCol.b);
   }
       
   joystickLastFrame = joystickThisFrame;
@@ -266,8 +306,13 @@ bool testForCharacterChange(void)
                           digitalRead(PIN_P4) == BUTTON_READ_CHECK ||
                           digitalRead(PIN_K1) == BUTTON_READ_CHECK ||
                           digitalRead(PIN_K4) == BUTTON_READ_CHECK;
+        
+        delay( MIN_LED_UPDATE_DELAY );
       }
 
+      kaimana.setALL(RED);
+      delay( MIN_LED_UPDATE_DELAY ); // give leds time to update
+      
       selectedCharacter = -1;
       while(selectedCharacter < 0)
       {
@@ -287,12 +332,14 @@ bool testForCharacterChange(void)
           selectedCharacter = 6;
         else if(digitalRead(PIN_K4) == BUTTON_READ_CHECK)
           selectedCharacter = 7;
+          
+        delay( MIN_LED_UPDATE_DELAY );
       }
 
       kaimana.setALL(BLACK);
       delay( MIN_LED_UPDATE_DELAY ); // give leds time to update
 
-     kaimana.switchHistoryClear();
+      kaimana.switchHistoryClear();
 
       return true;
     }
@@ -324,6 +371,8 @@ int pollSwitches(void)
       firsttime = 0;
     }
   }
+
+  kaimana.blendLEDs();
   
   // test switch and set LED based on result       // HOME = GUIDE
   // tests if we should switch into or out of tourney mode
@@ -369,24 +418,24 @@ int pollSwitches(void)
   // test switchs and set LED based on result    
   kaimana.switchHistoryBeginFrame();
 
-  checkButtonPressedAndSetRandomColourIfSo(PIN_SELECT, LED_SELECT);// SELECT = BACK
-  checkButtonPressedAndSetRandomColourIfSo(PIN_START, LED_START);
+  checkButtonPressedAndSetNewColourIfSo(PIN_SELECT, LED_SELECT);// SELECT = BACK
+  checkButtonPressedAndSetNewColourIfSo(PIN_START, LED_START);
  
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P1, LED_P1))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P1, LED_P1))
       kaimana.switchHistorySet(EIT_Input_P1);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P2, LED_P2))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P2, LED_P2))
       kaimana.switchHistorySet(EIT_Input_P2);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P3, LED_P3))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P3, LED_P3))
       kaimana.switchHistorySet(EIT_Input_P3);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_P4, LED_P4))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_P4, LED_P4))
       kaimana.switchHistorySet(EIT_Input_P4);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K1, LED_K1))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K1, LED_K1))
       kaimana.switchHistorySet(EIT_Input_K1);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K2, LED_K2))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K2, LED_K2))
       kaimana.switchHistorySet(EIT_Input_K2);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K3, LED_K3))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K3, LED_K3))
       kaimana.switchHistorySet(EIT_Input_K3);
-  if(checkButtonPressedAndSetRandomColourIfSo(PIN_K4, LED_K4))
+  if(checkButtonPressedAndSetNewColourIfSo(PIN_K4, LED_K4))
       kaimana.switchHistorySet(EIT_Input_K4);
 
   updateMovementHeldDirections();

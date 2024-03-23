@@ -24,6 +24,7 @@
 //  Revised:  October 29, 2013    zonbipanda // gmail.com
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
+//  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
 //
 
 #define __PROG_TYPES_COMPAT__
@@ -33,7 +34,7 @@
 #include "kaimana.h"
 #include "kaimana_custom.h"
 #include "animations.h"
-
+#include "Characters.h"
 
 void defaultStartup(void)
 {
@@ -55,28 +56,40 @@ void defaultStartup(void)
 
 // Color Fade Animation when Idle
 //
-int animation_idle(void)
+int animation_idle(const Character* currentCharacter)
 {
   int  index;
   int  i;
 
   // set initial color to BLACK
-  kaimana.setALL(BLACK);
+  if(currentCharacter->turnNonHeldButtonsOff() || currentCharacter->useStaticColourInIdle() == false)
+  {
+    kaimana.setALL(BLACK);
+  }
+
   delay( MIN_LED_UPDATE_DELAY ); // give leds time to update
 
   while(true)
   {
     for(index=0;index<IDLE_SIZE;++index)
     {
-      // update strip with new color2
+      // update strip with new color
       for(i=0;i<LED_COUNT;++i)
       {
-        kaimana.setLED(
-          i,
-          pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-          pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-          pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
-        );
+        if(currentCharacter->useStaticColourInIdle())
+        {
+          RGB_t thisCol = currentCharacter->idleStaticColour();
+          kaimana.setLED(i, thisCol.r, thisCol.g, thisCol.b);    
+        }
+        else //cycle rgb
+        {
+          kaimana.setLED(
+            i,
+            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
+          );
+        }
       }
 
       // update the leds with new/current colors in the array

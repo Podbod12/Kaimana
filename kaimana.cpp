@@ -24,6 +24,8 @@
 //  Revised:  October 29, 2013    zonbipanda // gmail.com
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
+//  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
+//  Revised:  Mar     22, 2024    Paul 'pod' Denning -- Added fade outs for button presses
 //
 
 #define __PROG_TYPES_COMPAT__
@@ -48,13 +50,89 @@ Kaimana::Kaimana(void)
   for(int pinIndex = 0; pinIndex < SWITCH_COUNT; ++pinIndex)
     pinMode( switchPins[pinIndex],   INPUT_PULLUP );
 
+  //init blend array
+  for(int blendIndex = 0; blendIndex < LED_ENTRIES; ++blendIndex)
+  {
+    _ledBlend[blendIndex].LEDPin = ledList[blendIndex];
+    _ledBlend[blendIndex].TimeSet = 0;
+  }
+
   // initialize Switch History
   switchHistoryClear();
 }
 
-// Sets LEDs to on in a globally defined brightness
-void Kaimana::setLED(int index, int iR, int iG, int iB)
+//Fade leds between 2 colours
+void Kaimana::blendLEDs(void)
 {
+  unsigned long timeNow = millis();
+  
+  for(int index = 0; index < LED_ENTRIES; ++index)
+  {
+    if(_ledBlend[index].TimeSet != 0)
+    {
+      //Hold time elapsed?
+      unsigned long timeBlendStart = _ledBlend[index].TimeSet + (unsigned long)_ledBlend[index].TimeToHold;
+      if(timeNow > timeBlendStart)
+      {
+        float blendPerc = (_ledBlend[index].TimeToBlend > 0) ? ((float)(timeNow - timeBlendStart) / (float)(_ledBlend[index].TimeToBlend)) : 1.0f;
+
+        //blend over?
+        if(blendPerc >= 1.0f)
+        {
+          blendPerc = 1.0f;
+          _ledBlend[index].TimeSet = 0;
+        }
+        
+        //do blend
+        setLED(_ledBlend[index].LEDPin, 
+        (int)_ledBlend[index].SourceCol.r + (((int)_ledBlend[index].DestCol.r - (int)_ledBlend[index].SourceCol.r) * blendPerc), 
+        (int)_ledBlend[index].SourceCol.g + (((int)_ledBlend[index].DestCol.g - (int)_ledBlend[index].SourceCol.g) * blendPerc), 
+        (int)_ledBlend[index].SourceCol.b + (((int)_ledBlend[index].DestCol.b - (int)_ledBlend[index].SourceCol.b) * blendPerc), 
+        true);
+      }
+    }
+  }
+}
+
+// Sets LEDs to on in a globally defined brightness
+void Kaimana::setLED(int index, int iR, int iG, int iB, bool bIsBlend, int holdTime, int fadeTime)
+{
+  int blendIndex = 0;
+  for(; blendIndex < LED_ENTRIES; ++blendIndex)
+  {
+      if(_ledBlend[blendIndex].LEDPin == index)
+        break;
+  }
+
+  //If its a blend then store away and exit
+  if(blendIndex != LED_ENTRIES && bIsBlend == false)
+  {
+    if((holdTime > 0 || fadeTime > 0))
+    {
+      if(_ledBlend[blendIndex].TimeSet == 0 || 
+         _ledBlend[blendIndex].DestCol.r != iR ||
+         _ledBlend[blendIndex].DestCol.g != iG || 
+         _ledBlend[blendIndex].DestCol.b != iB)
+      {
+        _ledBlend[blendIndex].SourceCol.r = _led[index].r;
+        _ledBlend[blendIndex].SourceCol.g = _led[index].g;
+        _ledBlend[blendIndex].SourceCol.b = _led[index].b;
+        _ledBlend[blendIndex].DestCol.r = iR;
+        _ledBlend[blendIndex].DestCol.g = iG;
+        _ledBlend[blendIndex].DestCol.b = iB;
+        _ledBlend[blendIndex].TimeSet = millis();
+        _ledBlend[blendIndex].TimeToHold = holdTime;
+        _ledBlend[blendIndex].TimeToBlend = fadeTime;
+      }
+
+      return;
+    }
+    else
+    {
+      _ledBlend[blendIndex].TimeSet = 0;
+    }
+  }
+  
   int ledForThisSlot = LED_PER_BUTTON;
   if(index == LED_DOWN || index == LED_UP || index == LED_LEFT || index == LED_RIGHT)
     ledForThisSlot = LED_PER_JOYSTICK_DIRECTION;
@@ -80,10 +158,16 @@ void Kaimana::setALL(int iR, int iG, int iB)
 {
   int index;
 
+  //reset all blends
+  for(int blendIndex = 0; blendIndex < LED_ENTRIES; ++blendIndex)
+  {
+    _ledBlend[blendIndex].TimeSet = 0;
+  }
+  
   // set all leds in the array to the RGB color passed to this function
   for(index=0;index<LED_COUNT;++index)
   {
-    setLED( index, iR, iG, iB );
+    setIndividualLED( index, iR, iG, iB );
   }
 
   // update the leds with new/current colors in the array
@@ -339,7 +423,7 @@ bool doesInputMatch(EInputTypes historyInput, EInputTypes comboInput, bool bIsCh
 }
 
 //todo : This is still a night mare for 360's and 720's. Need to add some kind of percentage of inputs hit or something. (like a rolling 2 out of 4 for any inputs over 6 inputs long
-boolean Kaimana::switchHistoryTest(EInputTypes* moveArray, int moveLength, EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo)
+boolean Kaimana::switchHistoryTest(const EInputTypes* moveArray, int moveLength, const EInputTypes* triggerArray, int triggerLength, bool bIsChargeCombo)
 {
   int lastIndexComboInputWasFound = -1;
   bool bHasFinishedDoingTriggerButtons = false;

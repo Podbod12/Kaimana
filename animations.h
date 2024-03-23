@@ -24,6 +24,7 @@
 //  Revised:  October 29, 2013    zonbipanda // gmail.com
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
+//  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
 //
 
 #ifndef __animations_h__
@@ -35,6 +36,7 @@
 #include "Arduino.h"
 #include "kaimana.h"
 #include "kaimana_custom.h"
+#include "Characters.h"
 
 extern Kaimana kaimana;
 
@@ -94,7 +96,7 @@ void Randomise_Combo_Animation(int NumFlash, int TimeLit, int DelayBetween,int R
 
 // other function prototypes
 
-int animation_idle(void);
+int animation_idle(const Character* currentCharacter);
 void showStartup(void);
 void defaultStartup(void);
 void tourneyModeActivate(void);
