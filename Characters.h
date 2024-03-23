@@ -78,12 +78,12 @@ class Ryu : public Character
     virtual void testForCharacterCombos( ) const override;
 
 //Example for White at all times but individual button will turn Red when pressed
-    virtual bool useStaticColourInIdle( ) const override { return true; };
-    virtual bool useStaticColourWhenPressed( ) const override { return true; };
-    virtual bool turnNonHeldButtonsOff( ) const override { return false; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
+//    virtual bool useStaticColourInIdle( ) const override { return true; };
+//    virtual bool useStaticColourWhenPressed( ) const override { return true; };
+//    virtual bool turnNonHeldButtonsOff( ) const override { return false; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
    
-    virtual int holdPressedButtonColourTimeInMS( ) const { return 0; };  //Make sure this plus...
-    virtual int fadePressedButtonColourTimeInMS( ) const { return 500; };  //...this is less than the time to restart the idle if turnNonHeldButtonsOff is true or it'll get stomped (IDLE_TIMEOUT_SECONDS * 1000)
+//    virtual int holdPressedButtonColourTimeInMS( ) const { return 0; };  //Make sure this plus...
+//    virtual int fadePressedButtonColourTimeInMS( ) const { return 500; };  //...this is less than the time to restart the idle if turnNonHeldButtonsOff is true or it'll get stomped (IDLE_TIMEOUT_SECONDS * 1000)
 
     virtual RGB_t idleStaticColour( ) const override { return getRGB(GREY); }; //Gi colour
     virtual RGB_t pressedStaticColour( ) const override { return getRGB(RED); }; //Headband colour
@@ -97,12 +97,12 @@ class Ken : public Character
     virtual void testForCharacterCombos( ) const override;
 
 //Example for Red when idling but individual button will turn Yellow when pressed and other buttons/stick lights will go black
-    virtual bool useStaticColourInIdle( ) const override { return true; };
-    virtual bool useStaticColourWhenPressed( ) const override { return true; };
-    virtual bool turnNonHeldButtonsOff( ) const override { return true; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
+//    virtual bool useStaticColourInIdle( ) const override { return true; };
+//    virtual bool useStaticColourWhenPressed( ) const override { return true; };
+//    virtual bool turnNonHeldButtonsOff( ) const override { return true; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
    
-    virtual int holdPressedButtonColourTimeInMS( ) const { return 500; };  //Make sure this plus...
-    virtual int fadePressedButtonColourTimeInMS( ) const { return 500; };  //...this is less than the time to restart the idle if turnNonHeldButtonsOff is true or it'll get stomped (IDLE_TIMEOUT_SECONDS * 1000)
+//    virtual int holdPressedButtonColourTimeInMS( ) const { return 500; };  //Make sure this plus...
+//    virtual int fadePressedButtonColourTimeInMS( ) const { return 500; };  //...this is less than the time to restart the idle if turnNonHeldButtonsOff is true or it'll get stomped (IDLE_TIMEOUT_SECONDS * 1000)
 
     virtual RGB_t idleStaticColour( ) const override { return getRGB(RED); }; //Gi colour
     virtual RGB_t pressedStaticColour( ) const override { return getRGB(YELLOW); }; //Hair colour :D
