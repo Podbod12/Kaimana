@@ -49,6 +49,7 @@
 
 #define  LED_ENTRIES         12 // should match the unique entries above (and thus array size below)
 const unsigned char ledList[LED_ENTRIES] = { LED_P4, LED_P3, LED_P2, LED_P1, LED_K1, LED_K2, LED_K3, LED_K4, LED_UP, LED_DOWN, LED_LEFT, LED_RIGHT};
+const unsigned char switchListForIdleExit[LED_ENTRIES] = { PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4, PIN_UP, PIN_DOWN, PIN_LEFT, PIN_RIGHT};
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)

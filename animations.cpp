@@ -79,11 +79,11 @@ int animation_idle(const Character* currentCharacter)
         if(currentCharacter->useStaticColourInIdle())
         {
           RGB_t thisCol = currentCharacter->idleStaticColour();
-          kaimana.setLED(i, thisCol.r, thisCol.g, thisCol.b);    
+          kaimana.setIndividualLED(i, thisCol.r, thisCol.g, thisCol.b);    
         }
         else //cycle rgb
         {
-          kaimana.setLED(
+          kaimana.setIndividualLED(
             i,
             pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
             pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
@@ -96,9 +96,9 @@ int animation_idle(const Character* currentCharacter)
       kaimana.updateALL();
 
       // test all switches and exit idle animation if active switch found
-      for(i=0;i<SWITCH_COUNT;++i)
+      for(i=0; i < LED_ENTRIES; ++i)
       {
-        if( digitalRead(switchPins[i]) == BUTTON_READ_CHECK)
+        if( digitalRead(switchListForIdleExit[i]) == BUTTON_READ_CHECK)
           return(false);
       }
 

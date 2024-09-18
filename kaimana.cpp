@@ -97,6 +97,9 @@ void Kaimana::blendLEDs(void)
 // Sets LEDs to on in a globally defined brightness
 void Kaimana::setLED(int index, int iR, int iG, int iB, bool bIsBlend, int holdTime, int fadeTime)
 {
+  if(index == 0xFF)
+    return;
+  
   int blendIndex = 0;
   for(; blendIndex < LED_ENTRIES; ++blendIndex)
   {
@@ -149,6 +152,9 @@ void Kaimana::setLED(int index, int iR, int iG, int iB, bool bIsBlend, int holdT
 // Sets LEDs to on in a globally defined brightness
 void Kaimana::setIndividualLED(int index, int iR, int iG, int iB)
 {
+  if(index == 0xFF)
+    return;
+
   _led[index].r = iR;
   _led[index].g = iG;
   _led[index].b = iB;
