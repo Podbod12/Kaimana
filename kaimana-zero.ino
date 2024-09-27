@@ -33,6 +33,8 @@ Dhalsim sim;
 
 //DeeJay deeJay;
 //Marisa marisa;
+//Akuma akuma;
+//Terry terry;
 
 const Character* AllCharacters[NUM_CHARACTERS] = { &ryu, &honda, &blanka, &guile, &ken, &chun, &gief, &sim };
 int8_t selectedCharacter = 0;
@@ -372,8 +374,6 @@ int pollSwitches(void)
     }
   }
 
-  kaimana.blendLEDs();
-  
   // test switch and set LED based on result       // HOME = GUIDE
   // tests if we should switch into or out of tourney mode
   if(digitalRead(PIN_HOME) == BUTTON_READ_CHECK)
@@ -401,7 +401,7 @@ int pollSwitches(void)
       iLED[LED_HOME] = true;
     }
   }
-  else
+  else if(LED_HOME != 0xFF)
   {
       // switch is inactive
       kaimana.setLED(LED_HOME, BLACK);
@@ -444,6 +444,8 @@ int pollSwitches(void)
   
   //Do selected Character combos/Special moves
   AllCharacters[selectedCharacter]->testForCharacterCombos();
+
+  kaimana.blendLEDs();
 
   // zero active switch counter
   iActiveSwitchCount = 0;

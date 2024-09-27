@@ -77,7 +77,7 @@ class Ryu : public Character
   public:
     virtual void testForCharacterCombos( ) const override;
 
-//Example for White at all times but individual button will turn Red when pressed
+    //Example for White at all times but individual button will turn Red when pressed
 //    virtual bool useStaticColourInIdle( ) const override { return true; };
 //    virtual bool useStaticColourWhenPressed( ) const override { return true; };
 //    virtual bool turnNonHeldButtonsOff( ) const override { return false; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
@@ -96,7 +96,7 @@ class Ken : public Character
   public:
     virtual void testForCharacterCombos( ) const override;
 
-//Example for Red when idling but individual button will turn Yellow when pressed and other buttons/stick lights will go black
+    //Example for Red when idling but individual button will turn Yellow when pressed and other buttons/stick lights will go black
 //    virtual bool useStaticColourInIdle( ) const override { return true; };
 //    virtual bool useStaticColourWhenPressed( ) const override { return true; };
 //    virtual bool turnNonHeldButtonsOff( ) const override { return true; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
@@ -195,6 +195,44 @@ class Marisa : public Character
     
     virtual RGB_t idleStaticColour( ) const override { return getRGB(GOLD); }; //Gi trim colour
     virtual RGB_t pressedStaticColour( ) const override { return getRGB(RED); }; //hair colour
+};
+
+class Akuma : public Character
+{
+  private:
+ 
+  public:
+    virtual void testForCharacterCombos( ) const override;
+
+    //These are the settings I like. Comment in and/or if you like.
+    //virtual bool useStaticColourInIdle( ) const override { return true; };
+    //virtual bool useStaticColourWhenPressed( ) const override { return true; };
+    //virtual bool turnNonHeldButtonsOff( ) const override { return true; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
+   
+    //virtual int holdPressedButtonColourTimeInMS( ) const { return 500; };  //Make sure this plus...
+    //virtual int fadePressedButtonColourTimeInMS( ) const { return 500; };  //...this is less than the time to restart the idle if turnNonHeldButtonsOff is true or it'll get stomped (IDLE_TIMEOUT_SECONDS * 1000)
+
+    virtual RGB_t idleStaticColour( ) const override { return getRGB(RED); }; //hair
+    virtual RGB_t pressedStaticColour( ) const override { return getRGB(DARKBLUE); }; //gi
+};
+
+class Terry : public Character
+{
+  private:
+ 
+  public:
+    virtual void testForCharacterCombos( ) const override;
+    
+    //These are the settings I like. Comment in and/or if you like.
+    //virtual bool useStaticColourInIdle( ) const override { return true; };
+    //virtual bool useStaticColourWhenPressed( ) const override { return true; };
+    //virtual bool turnNonHeldButtonsOff( ) const override { return true; };  //This is only used if you've set UseStaticColourInIdle to true. other wise it will always turn them off.
+   
+    //virtual int holdPressedButtonColourTimeInMS( ) const { return 500; };  //Make sure this plus...
+    //virtual int fadePressedButtonColourTimeInMS( ) const { return 500; };  //...this is less than the time to restart the idle if turnNonHeldButtonsOff is true or it'll get stomped (IDLE_TIMEOUT_SECONDS * 1000)
+
+    virtual RGB_t idleStaticColour( ) const override { return getRGB(RED); }; //jacket
+    virtual RGB_t pressedStaticColour( ) const override { return getRGB(YELLOW); }; //hair colour
 };
 
 #endif

@@ -47,9 +47,9 @@
   #define  LED_COUNT   48
 #endif
 
-#define  LED_ENTRIES         12 // should match the unique entries above (and thus array size below)
-const unsigned char ledList[LED_ENTRIES] = { LED_P4, LED_P3, LED_P2, LED_P1, LED_K1, LED_K2, LED_K3, LED_K4, LED_UP, LED_DOWN, LED_LEFT, LED_RIGHT};
-const unsigned char switchListForIdleExit[LED_ENTRIES] = { PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4, PIN_UP, PIN_DOWN, PIN_LEFT, PIN_RIGHT};
+#define  LED_ENTRIES         12 // should match the unique entries above (i.e the ones that arent 0xFF) (and thus array size below)
+const unsigned char ledList[LED_ENTRIES] = { LED_P4, LED_P3, LED_P2, LED_P1, LED_K1, LED_K2, LED_K3, LED_K4, LED_UP, LED_DOWN, LED_LEFT, LED_RIGHT}; //List all buttons that have LED's on them here
+const unsigned char switchListForIdleExit[LED_ENTRIES] = { PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4, PIN_UP, PIN_DOWN, PIN_LEFT, PIN_RIGHT}; //This must match the ledList array but with the pin's instead of leds.
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
@@ -129,6 +129,10 @@ const EInputTypes COMBO_630_LEFT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] =  { EIT_I
 const EInputTypes COMBO_630_UP_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] =    { EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
 const EInputTypes COMBO_630_RIGHT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down };
 const EInputTypes COMBO_630_DOWN_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] =  { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left };
+
+#define HELL_MURDER_INPUT_COUNT 3
+const EInputTypes HELL_MURDER_INPUT_LEFT[HELL_MURDER_INPUT_COUNT] = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Right };
+const EInputTypes HELL_MURDER_INPUT_RIGHT[HELL_MURDER_INPUT_COUNT] = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Left };
 
 //Most trigger arrays are generated locally in the character but these are worth having global for ease of use
 #define TRIPLEATTACK_TRIGGER_COUNT 3

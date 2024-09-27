@@ -25,6 +25,7 @@
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
 //  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
+//  Revised:  Oct     25, 2024    Paul 'pod' Denning -- Fixed 2 overflow errors, fixed incorrect idle exit when not using leds on all buttons. Added Terry and Akuma characters
 //
 
 #ifndef __kaimana_h__
@@ -105,6 +106,8 @@ enum EInputTypes
 #define  GOLD     255,150,0
 #define  BROWN    240,230,140
 #define  GREY     127,127,127
+#define  DARKGREY 60,60,60
+#define  DARKBLUE 000,000,100
 
 // RGB value structure.
 typedef struct __attribute__ ((__packed__)) {
