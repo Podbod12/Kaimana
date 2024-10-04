@@ -34,7 +34,7 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Akuma::testForCharacterCombos() const
+bool Akuma::testForCharacterCombos() const
 {
   EInputTypes P1Array[] = {EIT_Input_P1};
   EInputTypes P2Array[] = {EIT_Input_P2};
@@ -58,6 +58,8 @@ void Akuma::testForCharacterCombos() const
     Randomise_Combo_Animation(6, 120, 60, RED);
     Randomise_Combo_Animation(12, 70, 45, RED);
     Randomise_Combo_Animation(24, 30, 30, RED);
+    FlashColour_Combo_Animation(RED, 750);
+    return true;
   }
  
   //Shun goku satsu Right
@@ -66,6 +68,8 @@ void Akuma::testForCharacterCombos() const
     Randomise_Combo_Animation(6, 120, 60, RED);
     Randomise_Combo_Animation(12, 70, 45, RED);
     Randomise_Combo_Animation(24, 30, 30, RED);
+    FlashColour_Combo_Animation(RED, 750);
+    return true;
   }
   
   
@@ -78,6 +82,7 @@ void Akuma::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ))
   {
     FlashAllSpeedIncreasing_Combo_Animation(RED);
+    return true;
   }
 
   
@@ -87,6 +92,7 @@ void Akuma::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 2, PURPLE);  
+    return true;
   }
     
   //Super fireball left
@@ -95,6 +101,7 @@ void Akuma::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 2, PURPLE);  
+    return true;
   }
 
 
@@ -105,6 +112,7 @@ void Akuma::testForCharacterCombos() const
       kaimana.switchHistoryTest( LeftArray, 1, K2K3Array, 2, false ) )
   {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, DARKGREY);  
+    return true;
   }
 
   //Teleport Right
@@ -114,42 +122,76 @@ void Akuma::testForCharacterCombos() const
       kaimana.switchHistoryTest( RightArray, 1, K2K3Array, 2, false ) )
   {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, DARKGREY);  
+    return true;
   }
 
   
   //Dragon punch right
-   if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P1Array, 1, false ) )
+  if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P1Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(WHITE, 250);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P2Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(WHITE, 500);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P3Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(WHITE, 750);
+    return true;
+  }
     
   //Dragon punch left
-   if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P1Array, 1, false ) )
+  if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P1Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(WHITE, 250);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P2Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(WHITE, 500);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P3Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(WHITE, 750);
-
+    return true;
+  }
 
   //Fireball to the right
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, PURPLE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, PURPLE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Fast, 0, PURPLE);  
-
+    return true;
+  }
   //Fireball to the left
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, PURPLE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, PURPLE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Fast, 0, PURPLE);  
-
+    return true;
+  }
 
   //Hurricane kick
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
@@ -160,5 +202,8 @@ void Akuma::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     Circle_OneColour_Combo_Animation(1, WHITE);  
+    return true;
   }
+
+  return false;
 } 

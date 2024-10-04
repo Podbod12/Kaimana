@@ -34,7 +34,7 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Dhalsim::testForCharacterCombos() const
+bool Dhalsim::testForCharacterCombos() const
 {
   EInputTypes P1Array[] = {EIT_Input_P1};
   EInputTypes P2Array[] = {EIT_Input_P2};
@@ -55,6 +55,7 @@ void Dhalsim::testForCharacterCombos() const
   {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Medium, 3, RED);  
     FlashAllSpeedIncreasing_Combo_Animation(RED);
+    return true;
   }
 
   
@@ -64,6 +65,7 @@ void Dhalsim::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 4, RED);  
+    return true;
   }
     
   //Inferno left
@@ -72,56 +74,96 @@ void Dhalsim::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 4, RED);  
+    return true;
   }
 
 
   //Teleport
   if( kaimana.switchHistoryTest( LeftArray, 1, TRIGGER_PPP, TRIPLEATTACK_TRIGGER_COUNT, false ) ||
       kaimana.switchHistoryTest( RightArray, 1, TRIGGER_PPP, TRIPLEATTACK_TRIGGER_COUNT, false ) )
+  {
     KnightRider_Combo_Animation(1, true, RED);  
+    return true;
+  }
       
   if( kaimana.switchHistoryTest( LeftArray, 1, TRIGGER_KKK, TRIPLEATTACK_TRIGGER_COUNT, false ) ||
       kaimana.switchHistoryTest( RightArray, 1, TRIGGER_KKK, TRIPLEATTACK_TRIGGER_COUNT, false ) )
+  {
     KnightRider_Combo_Animation(1, false, RED);  
+    return true;
+  }
 
     
   //yoga Blast
   if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Slow, 2, RED);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Medium, 2, RED);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Fast, 2, RED);
+    return true;
+  }
 
    
   //Flame to the right
   if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, P1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, P2Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_RIGHT, HALFCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
-   WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 2, RED);  
+  {
+    WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 2, RED);  
+    return true;
+  }
 
   //flame to the left
   if( kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, P1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, P2Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
-   WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 2, RED);  
+  {
+    WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 2, RED);  
+    return true;
+  }
 
 
   //Fireball to the right
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, RED);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, RED);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Fast, 0, RED);  
+    return true;
+  }
 
   //Fireball to the left
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, RED);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, RED);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Fast, 0, RED);  
+    return true;
+  }
 
 
   //Yoga arch (both sides)
@@ -131,6 +173,10 @@ void Dhalsim::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Medium, 0, RED);  
+    return true;
+  }
 
+  return false;
 } 

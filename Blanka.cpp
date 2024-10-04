@@ -34,7 +34,7 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Blanka::testForCharacterCombos() const
+bool Blanka::testForCharacterCombos() const
 {
   EInputTypes P1Array[] = {EIT_Input_P1};
   EInputTypes P2Array[] = {EIT_Input_P2};
@@ -52,6 +52,7 @@ void Blanka::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ))
   {
     FlashAllSpeedIncreasing_Combo_Animation(YELLOW);
+    return true;
   }
   
   //shout of earth (both sides)
@@ -63,6 +64,7 @@ void Blanka::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     FlashColour_Combo_Animation(YELLOW, 750);
+    return true;
   }
 
 
@@ -75,33 +77,61 @@ void Blanka::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     Circle_OneColour_Combo_Animation(2, GREEN);  
+    return true;
   }
 
     
   //Vertical rolling attack
   if( kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Slow, 0, GREEN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Medium, 0, GREEN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Fast, 0, GREEN);  
+    return true;
+  }
     
 
   //Rolling attack to the right
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, GREEN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, GREEN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Fast, 0, GREEN);  
+    return true;
+  }
 
   //Rolling attack to the left
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, GREEN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, GREEN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Fast, 0, GREEN);  
+    return true;
+  }
 
 
   //ElectricThunder (Both sides)
@@ -113,5 +143,8 @@ void Blanka::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     Randomise_Combo_Animation(16, 60, 30, YELLOW);  
+    return true;
   }
+
+  return false;
 } 

@@ -49,7 +49,11 @@
 
 #define  LED_ENTRIES         12 // should match the unique entries above (i.e the ones that arent 0xFF) (and thus array size below)
 const unsigned char ledList[LED_ENTRIES] = { LED_P4, LED_P3, LED_P2, LED_P1, LED_K1, LED_K2, LED_K3, LED_K4, LED_UP, LED_DOWN, LED_LEFT, LED_RIGHT}; //List all buttons that have LED's on them here
-const unsigned char switchListForIdleExit[LED_ENTRIES] = { PIN_P1, PIN_P2, PIN_P3, PIN_P4, PIN_K1, PIN_K2, PIN_K3, PIN_K4, PIN_UP, PIN_DOWN, PIN_LEFT, PIN_RIGHT}; //This must match the ledList array but with the pin's instead of leds.
+
+//#define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_K4
+#define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_HOME
+//#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED 0xFF
+#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED PIN_HOME
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
@@ -57,7 +61,6 @@ const unsigned char switchListForIdleExit[LED_ENTRIES] = { PIN_P1, PIN_P2, PIN_P
 #define  FAST_COLOR_DELAY         150    // value in miliseconds
 #define  BOOT_COMPLETE_DELAY      500    // value in miliseconds
 #define  IDLE_TIMEOUT_SECONDS       1    // value in seconds - normally 60 or 30 seconds but set very short for testing
-#define  IDLE_ANIMATION_DELAY       5    // value in miliseconds - use smaller value for faster idle animation playback - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  MIN_LED_UPDATE_DELAY       5    // value in miliseconds - Gives kaimana/leds time to update correctly - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  T_DELAY      			  250    
 

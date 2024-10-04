@@ -62,19 +62,24 @@ Kaimana::Kaimana(void)
 }
 
 //Fade leds between 2 colours
-void Kaimana::blendLEDs(void)
+bool Kaimana::blendLEDs(bool bForceEnd)
 {
   unsigned long timeNow = millis();
+  bool bOneStillGoing = false;
   
   for(int index = 0; index < LED_ENTRIES; ++index)
   {
     if(_ledBlend[index].TimeSet != 0)
     {
+      bOneStillGoing = true;
+      
       //Hold time elapsed?
       unsigned long timeBlendStart = _ledBlend[index].TimeSet + (unsigned long)_ledBlend[index].TimeToHold;
-      if(timeNow > timeBlendStart)
+      if(bForceEnd || timeNow > timeBlendStart)
       {
         float blendPerc = (_ledBlend[index].TimeToBlend > 0) ? ((float)(timeNow - timeBlendStart) / (float)(_ledBlend[index].TimeToBlend)) : 1.0f;
+        if(bForceEnd)
+          blendPerc = 1.0f;
 
         //blend over?
         if(blendPerc >= 1.0f)
@@ -92,6 +97,8 @@ void Kaimana::blendLEDs(void)
       }
     }
   }
+
+  return bOneStillGoing;
 }
 
 // Sets LEDs to on in a globally defined brightness
@@ -556,5 +563,10 @@ boolean Kaimana::switchHistoryTest(const EInputTypes* moveArray, int moveLength,
   //if we get here we've found every single input! Combo passed
   //Clear the history to prevent retrigger if animation is really quick
   switchHistoryClear();
+  //also clear any existing blends
+  for(int blendIndex = 0; blendIndex < LED_ENTRIES; ++blendIndex)
+  {
+    _ledBlend[blendIndex].TimeSet = 0;
+  }
   return true;
 }

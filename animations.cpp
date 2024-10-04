@@ -55,58 +55,45 @@ void defaultStartup(void)
   delay( BOOT_COMPLETE_DELAY );  
 } 
 
+// set LED to one of 8 predefined colors selected at random
+void setLEDRandomColor(int index)
+{
+  int randomVal = random(0,NUM_RANDOM_COLORS);
+  kaimana.setLED(index, randomColors[randomVal].r, randomColors[randomVal].g, randomColors[randomVal].b);
+}
+
 // Color Fade Animation when Idle
 //
 int animation_idle(const Character* currentCharacter)
 {
-  int  index;
+  static int index = 0;
   int  i;
 
-  // set initial color to BLACK
-  if(currentCharacter->turnNonHeldButtonsOff() || currentCharacter->useStaticColourInIdle() == false)
+  EIdleType idleType = currentCharacter->getIdleAnimationType();
+  if(idleType == EIT_Rainbow)
   {
-    kaimana.setALL(BLACK);
-  }
+    index++;
+    if(index == IDLE_SIZE)
+      index = 0;
 
-  delay( MIN_LED_UPDATE_DELAY ); // give leds time to update
-
-  while(true)
-  {
-    for(index=0;index<IDLE_SIZE;++index)
+    // update strip with new color
+    for(i=0;i<LED_COUNT;++i)
     {
-      // update strip with new color
-      for(i=0;i<LED_COUNT;++i)
-      {
-        if(currentCharacter->useStaticColourInIdle())
-        {
-          RGB_t thisCol = currentCharacter->idleStaticColour();
-          kaimana.setIndividualLED(i, thisCol.r, thisCol.g, thisCol.b);    
-        }
-        else //cycle rgb
-        {
-          kaimana.setIndividualLED(
-            i,
-            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-            pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
-          );
-        }
-      }
-
-      // update the leds with new/current colors in the array
-      kaimana.updateALL();
-
-      // test all switches and exit idle animation if active switch found
-      for(i=0; i < LED_ENTRIES; ++i)
-      {
-        if( digitalRead(switchListForIdleExit[i]) == BUTTON_READ_CHECK)
-          return(false);
-      }
-
-      // place test for switches here and use calculated timer not delay
-      //
-      delay( IDLE_ANIMATION_DELAY );
+      kaimana.setIndividualLED(
+        i,
+        pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+        pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+        pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
+      );
     }
+  }
+  else if(idleType == EIT_StaticColour)
+  {
+    for(i=0;i<LED_ENTRIES;++i)
+    {
+      RGB_t thisCol = currentCharacter->getIdleAnimationStaticColour(ledList[i]);
+      kaimana.setLED(ledList[i], thisCol.r, thisCol.g, thisCol.b);
+    } 
   }
 }
 

@@ -9,9 +9,9 @@
 
 
 // local function declarations
-int  pollSwitches(void);
+bool pollSwitches(void);
 void setLEDRandomColor(int index);
-int tourneypollSwitches(void);
+bool tourneypollSwitches(void);
 boolean tournamentMode = false;
 int holdTimeout = 0;
 
@@ -35,6 +35,7 @@ Dhalsim sim;
 //Marisa marisa;
 //Akuma akuma;
 //Terry terry;
+//SF2 sf2;
 
 const Character* AllCharacters[NUM_CHARACTERS] = { &ryu, &honda, &blanka, &guile, &ken, &chun, &gief, &sim };
 int8_t selectedCharacter = 0;
@@ -58,8 +59,8 @@ void loop()
 {
   unsigned long  ulTimeout;
   
-  // initialize timeout value to now + some seconds
-  ulTimeout = millis() + ( (unsigned long)IDLE_TIMEOUT_SECONDS * 1000 );
+  // go straight into idle
+  ulTimeout = 0;
 
   // infinite loop of read switches, update LEDs and idle animation when necessary
   while(true)
@@ -67,31 +68,39 @@ void loop()
 	  if (tournamentMode != true)
 		{
 			// active -- poll switches and update leds
-			if( pollSwitches() != 0 )
+			if( pollSwitches() )
 			{
 				// some switches were active so reset idle timeout to now + some seconds
+        //also force first frame to correct colours
+        if(millis() > ulTimeout)
+        {
+          kaimana.blendLEDs(true);
+        }
+
 				ulTimeout = millis() + ( (unsigned long)IDLE_TIMEOUT_SECONDS * 1000 );
 			}
-			else
+		
+			if (tournamentMode != true) //retest here as it can change in the poll function
 			{
-				// no switches active so test for start of idle timeout  
+				// if there been enough time with no LEDS set by pollSwitches then do idle animation this frame
 				if( millis() > ulTimeout )
 				{
 				  animation_idle(AllCharacters[selectedCharacter]);
-
-          //Force set black when exiting idle (if applicable)
-          if(AllCharacters[selectedCharacter]->turnNonHeldButtonsOff() || AllCharacters[selectedCharacter]->useStaticColourInIdle() == false)
-            kaimana.setALL(BLACK);
 				}  
+
+        // update the leds with new/current colors in the array
+        kaimana.updateALL();
+
+        //Add a small delay to give the update function time to recover
+        delay( MIN_LED_UPDATE_DELAY );
 			}
 		}
 	  else
 	  {
-		  if( tourneypollSwitches() != 0 )
-  		{
-  			// some switches were active so reset idle timeout to now + some seconds
-  			ulTimeout = millis() + ( (unsigned long)IDLE_TIMEOUT_SECONDS * 1000 );
-  		}
+      if(tourneypollSwitches())
+      {
+        ulTimeout = 0;        
+      }
   	}    
   } 
 }
@@ -102,15 +111,6 @@ void loop()
 //  local functions start here
 //
 // ==============================================================
-
-
-// set LED to one of 8 predefined colors selected at random
-//
-void setLEDRandomColor(int index)
-{
-  int randomVal = random(0,NUM_RANDOM_COLORS);
-  kaimana.setLED(index, randomColors[randomVal].r, randomColors[randomVal].g, randomColors[randomVal].b);
-}
 
 //See if an attack button is held, record it and set a random colour for that button if newly pressed
 bool checkButtonPressedAndSetNewColourIfSo(int pin, int led)
@@ -131,28 +131,16 @@ bool checkButtonPressedAndSetNewColourIfSo(int pin, int led)
       else
       {
         // select new color when switch is first activated
-        if(AllCharacters[selectedCharacter]->useStaticColourWhenPressed())
-        {
-          RGB_t thisCol = AllCharacters[selectedCharacter]->pressedStaticColour();
-          kaimana.setLED(led, thisCol.r, thisCol.g, thisCol.b);
-        }      
-        else //random colour
-        {
-          setLEDRandomColor(led);
-        }
+        RGB_t thisCol = AllCharacters[selectedCharacter]->pressedStaticColour(led);
+        kaimana.setLED(led, thisCol.r, thisCol.g, thisCol.b);
         iLED[led] = true;
       }
     }
     else
     {
         // switch is inactive
-        if(AllCharacters[selectedCharacter]->turnNonHeldButtonsOff() || AllCharacters[selectedCharacter]->useStaticColourInIdle() == false)
-          kaimana.setLED(led, BLACK, false, AllCharacters[selectedCharacter]->holdPressedButtonColourTimeInMS(),  AllCharacters[selectedCharacter]->fadePressedButtonColourTimeInMS());
-        else
-        {
-          RGB_t thisCol = AllCharacters[selectedCharacter]->idleStaticColour();
-          kaimana.setLED(led, thisCol.r, thisCol.g, thisCol.b, false, AllCharacters[selectedCharacter]->holdPressedButtonColourTimeInMS(),  AllCharacters[selectedCharacter]->fadePressedButtonColourTimeInMS());
-        }
+        RGB_t thisCol = AllCharacters[selectedCharacter]->notPressedStaticColour(led);
+        kaimana.setLED(led, thisCol.r, thisCol.g, thisCol.b, false, AllCharacters[selectedCharacter]->holdPressedButtonColourTimeInMS(),  AllCharacters[selectedCharacter]->fadePressedButtonColourTimeInMS());
       
         iLED[led] = false;
     }
@@ -224,22 +212,14 @@ void updateMovementHeldDirections()
     }
   }
 
-  boolean bResetToBlack = false;
-  if(AllCharacters[selectedCharacter]->turnNonHeldButtonsOff() || AllCharacters[selectedCharacter]->useStaticColourInIdle() == false)
-    bResetToBlack = true;
-
   //if using joystick pcb diagonals and it changes then we need to reset all directional lights
   if(bUpdateJoystickDiagonals)
   {
-    RGB_t thisCol = AllCharacters[selectedCharacter]->idleStaticColour();
-
     int ledArray[] = {LED_UP, LED_LEFT, LED_RIGHT, LED_DOWN};
     for(int index = 0; index < 4; ++index)
     {
-      if(bResetToBlack)
-        kaimana.setLED(ledArray[index], BLACK);
-      else
-        kaimana.setLED(ledArray[index], thisCol.r, thisCol.g, thisCol.b);
+      RGB_t thisCol = AllCharacters[selectedCharacter]->notPressedStaticColour(ledArray[index]);
+      kaimana.setLED(ledArray[index], thisCol.r, thisCol.g, thisCol.b);
       iLED[ledArray[index]] = false;
     }
   }
@@ -253,24 +233,13 @@ void updateMovementHeldDirections()
   //if using joystick pcb diagonals then now remove the 4 unneeded lights
   if(bUpdateJoystickDiagonals && (joystickThisFrame == EIT_Input_UpLeft || joystickThisFrame == EIT_Input_UpRight || joystickThisFrame == EIT_Input_DownLeft || joystickThisFrame == EIT_Input_DownRight))
   {
-    RGB_t thisCol = AllCharacters[selectedCharacter]->idleStaticColour();
-    
-    if(bResetToBlack)
-      kaimana.setIndividualLED(firstDirection, BLACK);
-    else
-      kaimana.setIndividualLED(firstDirection, thisCol.r, thisCol.g, thisCol.b);
-    if(bResetToBlack)
-      kaimana.setIndividualLED(firstDirection+1, BLACK);
-    else
-      kaimana.setIndividualLED(firstDirection+1, thisCol.r, thisCol.g, thisCol.b);
-    if(bResetToBlack)
-      kaimana.setIndividualLED(secondDirection+2, BLACK);
-    else
-      kaimana.setIndividualLED(secondDirection+2, thisCol.r, thisCol.g, thisCol.b);
-    if(bResetToBlack)
-      kaimana.setIndividualLED(secondDirection+3, BLACK);
-    else
-      kaimana.setIndividualLED(secondDirection+3, thisCol.r, thisCol.g, thisCol.b);
+    RGB_t firstCol = AllCharacters[selectedCharacter]->notPressedStaticColour(firstDirection);
+    RGB_t secondCol = AllCharacters[selectedCharacter]->notPressedStaticColour(secondDirection);
+   
+    kaimana.setIndividualLED(firstDirection, firstCol.r, firstCol.g, firstCol.b);
+    kaimana.setIndividualLED(firstDirection+1, firstCol.r, firstCol.g, firstCol.b);
+    kaimana.setIndividualLED(secondDirection+2, secondCol.r, secondCol.g, secondCol.b);
+    kaimana.setIndividualLED(secondDirection+3, secondCol.r, secondCol.g, secondCol.b);
   }
       
   joystickLastFrame = joystickThisFrame;
@@ -354,9 +323,8 @@ bool testForCharacterChange(void)
   return false;
 }
 
-int pollSwitches(void)
+bool pollSwitches(void)
 {
-  static int  iActiveSwitchCount = 0;
   static int  i = 0;  
   static int  j = 0;  
   static int  firsttime = 1;
@@ -376,36 +344,44 @@ int pollSwitches(void)
 
   // test switch and set LED based on result       // HOME = GUIDE
   // tests if we should switch into or out of tourney mode
-  if(digitalRead(PIN_HOME) == BUTTON_READ_CHECK)
+  if(digitalRead(PIN_TO_SWITCH_TO_TOURNEY_MODE) == BUTTON_READ_CHECK)
   {
     // switch is active
-    if(iLED[LED_HOME] == true)
+    if(PIN_TO_SWITCH_TO_TOURNEY_MODE_LED != 0xFF)
     {
-      //maintain color while switch is active
-      //Add custom "when held" code here
-      
-	   //Button hold to change idle animation
-	  	holdTimeout += 1;
-
-  		//Button hold to start tourneymode		
-  		if(holdTimeout == 1000)
-  		{
-  		  tournamentMode = true;
-  		  tourneyModeActivate();
-  		}
+      if(iLED[PIN_TO_SWITCH_TO_TOURNEY_MODE_LED] == true)
+      {
+        //maintain color while switch is active
+        //Add custom "when held" code here
+      }
+      else
+      {
+        // select new color when switch is first activated
+        setLEDRandomColor(LED_HOME);
+        iLED[PIN_TO_SWITCH_TO_TOURNEY_MODE_LED] = true;
+      }
     }
-    else
+    
+    //Button hold to change idle animation
+    holdTimeout += 1;
+
+    //Button hold to start tourneymode    
+    if(holdTimeout == 500)
     {
-      // select new color when switch is first activated
-      setLEDRandomColor(LED_HOME);
-      iLED[LED_HOME] = true;
+      tournamentMode = true;
+      tourneyModeActivate();
+      return true;
     }
   }
-  else if(LED_HOME != 0xFF)
+  else
   {
       // switch is inactive
-      kaimana.setLED(LED_HOME, BLACK);
-      iLED[LED_HOME] = false;	  	 
+      if(LED_HOME != 0xFF)
+      {
+        kaimana.setLED(PIN_TO_SWITCH_TO_TOURNEY_MODE_LED, BLACK);
+        iLED[PIN_TO_SWITCH_TO_TOURNEY_MODE_LED] = false;	  	 
+      }
+      
 	    holdTimeout=0;
   }
 
@@ -443,62 +419,60 @@ int pollSwitches(void)
   kaimana.switchHistoryEndFrame();
   
   //Do selected Character combos/Special moves
-  AllCharacters[selectedCharacter]->testForCharacterCombos();
+  bool bSpecialFired = false;
+  if(AllCharacters[selectedCharacter]->testForCharacterCombos())
+  {
+    bSpecialFired = true;
+    
+    //reset all light storage and colours
+    for(i=0;i<LED_COUNT;++i)
+    {
+      iLED[i] = false;
+    }
+    for(i=0;i<LED_ENTRIES;++i)
+    {
+      RGB_t thisCol = AllCharacters[selectedCharacter]->notPressedStaticColour(ledList[i]);
+      kaimana.setLED(ledList[i], thisCol.r, thisCol.g, thisCol.b);
+    }        
+  }
 
+  //blend the leds. this will return true if theres at least one blend still going so
+  //return true here to make sure the idle animation doesnt kick in.
   kaimana.blendLEDs();
-
-  // zero active switch counter
-  iActiveSwitchCount = 0;
   
-  // set LED color based on switch
+  // test all led's and return true if any set (will stop/delay idle animation)
   for(i=0;i<LED_COUNT;++i)
   {
-    if(iLED[i] == true)
-      ++iActiveSwitchCount;
-  }  
+    if(iLED[i])
+      return true;
+  }
 
-  // update the leds with new/current colors in the array
-  kaimana.updateALL();
-
-  //Add a small delay to give the update function time to recover
-  delay( MIN_LED_UPDATE_DELAY );
-
-  // return number of active switches
-  return(iActiveSwitchCount);
+  return bSpecialFired;
 }  
 
-int tourneypollSwitches(void)
+bool tourneypollSwitches(void)
 {
-  static int  iLED[LED_COUNT];
-  static int  iActiveSwitchCount = 0;
-  static int  i;
-  static int  j;
-  static int  firsttime;
-  static uint16_t  joystickDirection;
-  static uint16_t  switchActivity;
-
   // test switch and set LED based on result       // HOME = GUIDE
-  if(!digitalRead(PIN_HOME))
+  if(!digitalRead(PIN_TO_SWITCH_TO_TOURNEY_MODE))
   {
 	  //Button hold to change idle animation
 		holdTimeout += 1;
 		//Button hold to end tourneymode		
-		if(holdTimeout == 200)
+		if(holdTimeout == 1000)
 		{
   		tournamentMode = false;
   		tourneyModeDeactivate();
+      return true;
 		}
-    
-    ++iActiveSwitchCount;
-	  
+ 
 	  delay(10);	  
   }
   else
   {  	 
   	holdTimeout=0;
   }
-   
-  return(iActiveSwitchCount);
+
+  return false;
 }
 
  

@@ -86,6 +86,13 @@ enum EInputTypes
   EIT_INPUT_MAX,
 };
 
+enum EIdleType
+{
+  EIT_Rainbow,
+  EIT_StaticColour,
+  EIT_Disabled,
+};
+
 // number of switch inputs on kaimana
 #define  SWITCH_COUNT         15
 
@@ -126,9 +133,9 @@ typedef struct __attribute__ ((__packed__)) {
 
 // Input Blend structure.
 typedef struct __attribute__ ((__packed__)) {
-    unsigned long TimeSet;
-    int TimeToHold;
-    int TimeToBlend;
+    unsigned long TimeSet = 0;
+    int TimeToHold = 0;
+    int TimeToBlend = 0;
     uint8_t LEDPin;
     RGB_t SourceCol;
     RGB_t DestCol;
@@ -159,7 +166,7 @@ class Kaimana
  
  public:
     Kaimana(void);
-    void    blendLEDs(void);
+    bool    blendLEDs(bool bForceEnd = false);
     void    setLED(int index, int iR, int iG, int iB, bool bIsBlend = false, int holdTime = 0, int fadeTime = 0);
     void    setIndividualLED(int index, int iR, int iG, int iB);
     void    setALL(int iR, int iG, int iB);
