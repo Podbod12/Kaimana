@@ -36,13 +36,6 @@
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
 bool Ken::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   //Super Dragon punch right
   if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) ||

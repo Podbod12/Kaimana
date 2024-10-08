@@ -449,7 +449,7 @@ boolean Kaimana::switchHistoryTest(const EInputTypes* moveArray, int moveLength,
   EInputTypes comboArray[SWITCH_HISTORY_MAX];
   for(int index = 0; index < moveLength && index < SWITCH_HISTORY_MAX; ++index)
   {
-    comboArray[index] = moveArray[index];
+    comboArray[index] = pgm_read_byte_near(&moveArray[index]);
   }
   for(int index = 0; index < triggerLength && moveLength + index < SWITCH_HISTORY_MAX; ++index)
   {

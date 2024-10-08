@@ -62,7 +62,7 @@
 
 //possible input types for gameplay and combo matching
 //combo detection requires attack buttons be grouped together
-enum EInputTypes
+enum EInputTypes:uint8_t
 {
   EIT_INPUT_NONE,
   EIT_Input_Up,
@@ -86,10 +86,23 @@ enum EInputTypes
   EIT_INPUT_MAX,
 };
 
-enum EIdleType
+//shared input arrays
+const EInputTypes P1Array[1] = {EIT_Input_P1};
+const EInputTypes P2Array[1] = {EIT_Input_P2};
+const EInputTypes P3Array[1] = {EIT_Input_P3};
+const EInputTypes K1Array[1] = {EIT_Input_K1};
+const EInputTypes K2Array[1] = {EIT_Input_K2};
+const EInputTypes K3Array[1] = {EIT_Input_K3};
+
+enum EIdleType:uint8_t
 {
-  EIT_Rainbow,
+  EIT_RainbowCircling,
+  EIT_RainbowPulsing,
   EIT_StaticColour,
+  EIT_StaticColourPulsing,
+  EIT_StaticColourCirclePulse,
+  EIT_StaticColourCircleDualPulse,
+  EIT_StaticColourPingPongPulse,
   EIT_Disabled,
 };
 

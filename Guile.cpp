@@ -36,13 +36,6 @@
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
 bool Guile::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   //CrossFire somersault (both ways)
   if( kaimana.switchHistoryTest( COMBO_CHARGE_SUPER_RIGHT_LEFT, CHARGE_SUPER_INPUT_COUNT, K1Array, 1, true ) ||
       kaimana.switchHistoryTest( COMBO_CHARGE_SUPER_RIGHT_LEFT, CHARGE_SUPER_INPUT_COUNT, K2Array, 1, true ) ||

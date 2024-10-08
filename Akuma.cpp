@@ -18,7 +18,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-//  Kaimana Ryu character combo checks and animation calls. First released by ParadiseArcadeShop.com November, 2023
+//  Kaimana Akuma character combo checks and animation calls. First released by ParadiseArcadeShop.com November, 2023
 //  Characters are added into the character selection array in the main ino file. See that for info on how characters are selected
 //
 //  Created:  Oct, 2024    Paul 'pod' Denning
@@ -36,13 +36,6 @@
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
 bool Akuma::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   EInputTypes K1K2Array[] = {EIT_Input_K1, EIT_Input_K2};
   EInputTypes K1K3Array[] = {EIT_Input_K1, EIT_Input_K3};
   EInputTypes K2K3Array[] = {EIT_Input_K2, EIT_Input_K3};

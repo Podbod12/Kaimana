@@ -57,8 +57,9 @@ class Character
       return returnRGB;
     }
 
-    virtual EIdleType getIdleAnimationType() const { return EIT_Rainbow; } //Default implementation, ranbow rotation through all leds.
-    virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const { return getRGB(BLACK); }; //ignored unless idle anim type is StaticColour, override this is each character class if required.
+    virtual EIdleType getIdleAnimationType() const { return EIT_RainbowCircling; } //Default implementation, ranbow rotation through all leds.
+    virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const { return getRGB(BLACK); }; //ignored unless idle anim type is StaticColour, override this is each character class if required. if you dont override it will use this BLACK setting
+    virtual RGB_t getIdleAnimationPulseColour(int ledIndex) const { return getRGB(WHITE); }; //ignored unless idle anim type is one of the pulse types, override this is each character class if required. if you dont override it will use this WHITE setting
 
     virtual int holdPressedButtonColourTimeInMS( ) const { return 0; };  //Make sure this plus...
     virtual int fadePressedButtonColourTimeInMS( ) const { return 0; };  //...this is less than the time to restart the idle if its not disabled in getIdleAnimationType() with EIT_Disabled or it'll get stomped ny it (IDLE_TIMEOUT_SECONDS * 1000)
@@ -104,7 +105,7 @@ class Ryu : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
 
-    //Example for White at all times but individual button will turn Red when pressed
+    //Example for grey at all times but individual button will turn Red when pressed and will fade back to white when released
     //virtual EIdleType getIdleAnimationType() const override { return EIT_Disabled; }
   
     //virtual int holdPressedButtonColourTimeInMS( ) const override { return 0; };  //Make sure this plus...
@@ -121,8 +122,8 @@ class Ken : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
 
-    //Example for Red when idling but individual button will turn Yellow when pressed and other buttons/stick lights will go black
-    //virtual EIdleType getIdleAnimationType() const override { return EIT_StaticColour; }
+    //Example for pulsing Red when idling but individual button will turn Yellow when pressed and other buttons/stick lights will go black. Will wait for a small amount then fade back to black when released.
+    //virtual EIdleType getIdleAnimationType() const override { return EIT_StaticColourPulsing; }
     //virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const override { return getRGB(RED); }; //Gi colour
    
     //virtual int holdPressedButtonColourTimeInMS( ) const { return 500; };  //Make sure this plus...
@@ -139,7 +140,12 @@ class Chun : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
-    //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(BLUE); }; //Gi colour
+    //Example for BLUE idle mode with a WHITE pulse when idling that reverses back and forth across all buttons. Out of idle will be BLUE if not pressed and WHITE if pressed
+    //virtual EIdleType getIdleAnimationType() const override { return EIT_StaticColourPingPongPulse; }
+    //virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const override { return getRGB(BLUE); }; //Gi colour
+    //virtual RGB_t getIdleAnimationPulseColour(int ledIndex) const override { return getRGB(WHITE); }; 
+
+    //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(BLACK); }; //Gi colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(WHITE); }; //boot colour
 };
 
@@ -149,6 +155,11 @@ class Guile : public Character
  
   public:
     virtual bool testForCharacterCombos( ) const override;
+    
+    //Example for RED idle mode with 2 rotating WHITE pulses when idling. Out of idle will be GREEN if not pressed and YELLOW if pressed
+    //virtual EIdleType getIdleAnimationType() const override { return EIT_StaticColourCircleDualPulse; }
+    //virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const override { return getRGB(RED); }; //Gi colour
+    //virtual RGB_t getIdleAnimationPulseColour(int ledIndex) const override { return getRGB(WHITE); };
     
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(GREEN); }; //Gi colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(YELLOW); }; //Hair colour
@@ -161,6 +172,10 @@ class Gief : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
+    //Example for YELLOW idle mode. Out of idle will be RED if not pressed and GREEN if pressed
+    //virtual EIdleType getIdleAnimationType() const override { return EIT_StaticColour; }
+    //virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const override { return getRGB(YELLOW); }; //Gi colour
+
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(RED); }; //Pants colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(GREEN); }; //Hand colour :D
 };
@@ -172,6 +187,7 @@ class Dhalsim : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
+    //Example for RainbowCircle idle mode. Out of idle will be WHITE if not pressed and GOLD if pressed
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(GOLD); }; //Shorts colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(WHITE); }; //skulls colour
 };
@@ -183,6 +199,9 @@ class Honda : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
+    virtual EIdleType getIdleAnimationType() const override { return EIT_RainbowPulsing; }
+
+    //Example for RainbowCircle idle mode. Out of idle will be RED if not pressed and BLUE if pressed
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(BLUE); }; //Gi colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(RED); }; //facepaint colour
 };
@@ -194,6 +213,11 @@ class Blanka : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
+    //Example for GREEN idle mode with 1 rotating WHITE pulse when idling. Out of idle will be ORANGE if not pressed and GREEN if pressed
+    //virtual EIdleType getIdleAnimationType() const override { return EIT_StaticColourCirclePulse; }
+    //virtual RGB_t getIdleAnimationStaticColour(int ledIndex) const override { return getRGB(GREEN); }; //Gi colour
+    //virtual RGB_t getIdleAnimationPulseColour(int ledIndex) const override { return getRGB(WHITE); };
+
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(GREEN); }; //Skin colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(ORANGE); }; //Shorts/bangle colour
 };
@@ -206,6 +230,7 @@ class DeeJay : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
+    //Example for RainbowCircle idle mode. Out of idle will be GREEN if not pressed and ORANGE if pressed
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(ORANGE); }; //Original gi colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(GREEN); }; //New gi colour
 };
@@ -217,6 +242,7 @@ class Marisa : public Character
   public:
     virtual bool testForCharacterCombos( ) const override;
     
+    //Example for RainbowCircle idle mode. Out of idle will be GOLD if not pressed and RED if pressed
     //virtual RGB_t notPressedStaticColour(int ledIndex) const override { return getRGB(GOLD); }; //Gi trim colour
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(RED); }; //hair colour
 };
@@ -255,4 +281,23 @@ class Terry : public Character
     //virtual RGB_t pressedStaticColour(int ledIndex) const override { return getRGB(YELLOW); }; //hair colour
 };
 
+class JP : public Character
+{
+  private:
+ 
+  public:
+    virtual bool testForCharacterCombos( ) const override;
+    
+    //These are the settings Plagio_96 who requested JP asked for. Comment in or edit as you like.
+    /*virtual RGB_t pressedStaticColour(int ledIndex) const override
+    {
+      if(ledIndex == LED_P4 || ledIndex == LED_K4)
+        return getRGB(RED);
+       if(ledIndex == LED_P1 || ledIndex == LED_K1 || ledIndex == LED_P2 || ledIndex == LED_K2 || ledIndex == LED_P3 || ledIndex == LED_K3)
+        return getRGB(WHITE);
+
+      //all other buttons and directions
+      return getRGB(BLUE); 
+    };*/
+};
 #endif

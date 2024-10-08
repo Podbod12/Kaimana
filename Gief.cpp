@@ -36,13 +36,6 @@
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
 bool Gief::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   EInputTypes P1P2Array[] = {EIT_Input_P1, EIT_Input_P2};
   EInputTypes P1P3Array[] = {EIT_Input_P1, EIT_Input_P3};
   EInputTypes P2P3Array[] = {EIT_Input_P2, EIT_Input_P3};

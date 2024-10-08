@@ -62,38 +62,178 @@ void setLEDRandomColor(int index)
   kaimana.setLED(index, randomColors[randomVal].r, randomColors[randomVal].g, randomColors[randomVal].b);
 }
 
+int getFrameIncForIdleMode(EIdleType idleType)
+{
+  //If specific idle modes feel slow then you can increase the speed here. Use this as an example. Ideally you should use a number that is a factor of IDLE_SIZE (768)
+  if(idleType == EIT_StaticColourCirclePulse || idleType == EIT_StaticColourCircleDualPulse || idleType == EIT_StaticColourPingPongPulse)
+    return IDLE_CIRCLEPULSE_SPEED;
+
+  return 1;
+}
+
+RGB_t getBlendedPulseColour(int i, int ledIndex, int frameIndex, const Character* currentCharacter)
+{
+  int offset = IDLE_OFFSET_2;
+  if(i != 0)
+    offset = (i == 1) ? IDLE_OFFSET_1 : IDLE_OFFSET_0;
+
+  //Grab colours
+  RGB_t thisStaticCol = currentCharacter->getIdleAnimationStaticColour(ledList[ledIndex]);
+  RGB_t thisPulseCol = currentCharacter->getIdleAnimationPulseColour(ledList[ledIndex]);
+  RGB_t thisCol;
+
+  //Get blend prop
+  int colourIndex = frameIndex+offset;
+  if(colourIndex >= IDLE_SIZE)
+    return thisStaticCol;
+    
+  float mul = (float)(pgm_read_byte_near(&colorCycleData[colourIndex]));
+  mul /= 256.0f;  
+
+  //generate blended colour
+  thisCol.r = thisStaticCol.r + (int)((float)(thisPulseCol.r - thisStaticCol.r) * mul);
+  thisCol.g = thisStaticCol.g + (int)((float)(thisPulseCol.g - thisStaticCol.g) * mul);
+  thisCol.b = thisStaticCol.b + (int)((float)(thisPulseCol.b - thisStaticCol.b) * mul);
+
+  return thisCol;
+}
+
+void setStaticColourToAllLeds(const Character* currentCharacter)
+{
+  for(int i=0;i<LED_ENTRIES;++i)
+  {
+    RGB_t thisCol = currentCharacter->getIdleAnimationStaticColour(ledList[i]);
+    kaimana.setLED(ledList[i], thisCol.r, thisCol.g, thisCol.b);
+  }
+}
+
 // Color Fade Animation when Idle
 //
 int animation_idle(const Character* currentCharacter)
 {
-  static int index = 0;
+  static int frameIndex = 0;
+  static int workingIndex = 0;
   int  i;
+  bool bFrameLoop = false;
 
   EIdleType idleType = currentCharacter->getIdleAnimationType();
-  if(idleType == EIT_Rainbow)
-  {
-    index++;
-    if(index == IDLE_SIZE)
-      index = 0;
 
+  //Increment the frame timer and reset when needed
+  frameIndex += getFrameIncForIdleMode(idleType);
+  int frameLimit = IDLE_SIZE;
+  if(idleType == EIT_StaticColourCirclePulse || idleType == EIT_StaticColourCircleDualPulse || idleType == EIT_StaticColourPingPongPulse)
+    frameLimit = IDLE_OFFSET_1;
+  if(frameIndex >= frameLimit)
+  {
+    frameIndex = 0;
+    bFrameLoop = true;
+  }
+    
+  if(idleType == EIT_RainbowCircling)
+  {
     // update strip with new color
     for(i=0;i<LED_COUNT;++i)
     {
       kaimana.setIndividualLED(
         i,
-        pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-        pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
-        pgm_read_byte_near(&colorCycleData[((index+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
+        pgm_read_byte_near(&colorCycleData[((frameIndex+IDLE_OFFSET_2+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+        pgm_read_byte_near(&colorCycleData[((frameIndex+IDLE_OFFSET_1+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)]),
+        pgm_read_byte_near(&colorCycleData[((frameIndex+IDLE_OFFSET_0+((LED_COUNT-i)*IDLE_OFFSET))%IDLE_SIZE)])
       );
     }
   }
+  else if(idleType == EIT_RainbowPulsing)
+  {
+      kaimana.setALL(
+        pgm_read_byte_near(&colorCycleData[((frameIndex+IDLE_OFFSET_2)%IDLE_SIZE)]),
+        pgm_read_byte_near(&colorCycleData[((frameIndex+IDLE_OFFSET_1)%IDLE_SIZE)]),
+        pgm_read_byte_near(&colorCycleData[((frameIndex+IDLE_OFFSET_0)%IDLE_SIZE)])
+      );
+  }
   else if(idleType == EIT_StaticColour)
+  {
+    setStaticColourToAllLeds(currentCharacter);
+  }
+  else if(idleType == EIT_StaticColourPulsing)
   {
     for(i=0;i<LED_ENTRIES;++i)
     {
       RGB_t thisCol = currentCharacter->getIdleAnimationStaticColour(ledList[i]);
-      kaimana.setLED(ledList[i], thisCol.r, thisCol.g, thisCol.b);
+      float multiplier = 0.2f + ((1.0f + sin(IDLE_PULSE_SPEED * millis())) * 0.4f);
+      kaimana.setLED(ledList[i], (int)((float)thisCol.r * multiplier), (int)((float)thisCol.g * multiplier), (int)((float)thisCol.b * multiplier));
     } 
+  }
+  else if(idleType == EIT_StaticColourCirclePulse || idleType == EIT_StaticColourCircleDualPulse)
+  {
+    //Reset all lights
+    setStaticColourToAllLeds(currentCharacter);
+      
+    //make sure in range if coming from another idle
+    if(workingIndex < 0 || workingIndex >= LED_ENTRIES)
+      workingIndex = 0;
+
+    //Each loop move to the next led
+    if(bFrameLoop)
+    {
+      workingIndex = (workingIndex + 1) % LED_ENTRIES;
+    }
+    
+    // update strip with new color
+    for(i=0;i<3;++i)
+    {
+      int ledIndex = (i + workingIndex) % LED_ENTRIES;
+
+      //Get blended colour for this button
+      RGB_t thisCol = getBlendedPulseColour(i, ledIndex, frameIndex, currentCharacter);
+
+      //apply to led
+      kaimana.setLED(ledList[ledIndex], thisCol.r, thisCol.g, thisCol.b);
+
+      //if its a dual loop then do the same to the led half way along from where I currently am.
+      if(idleType == EIT_StaticColourCircleDualPulse)
+      {
+        int secondLed = (ledIndex + (LED_ENTRIES / 2)) % LED_ENTRIES;
+        kaimana.setLED(ledList[secondLed], thisCol.r, thisCol.g, thisCol.b);   
+      }
+    }
+  }
+  else if(idleType == EIT_StaticColourPingPongPulse)
+  {
+    //Reset all lights
+    setStaticColourToAllLeds(currentCharacter);
+    
+    //reset if coming from another 
+    if(workingIndex < -2 || workingIndex > ((LED_ENTRIES * 2) + 1))
+      workingIndex = -2;
+
+    //advance to next led on loop
+    if(bFrameLoop)
+    {
+      workingIndex = (workingIndex + 1);
+      if(workingIndex > ((LED_ENTRIES * 2) + 1))
+        workingIndex = -2;
+    }
+    
+    // update strip with new color
+    for(i=0;i<3;++i)
+    {
+      //work out led to light up
+      int ledIndex = workingIndex + i;
+
+      //are we on the return trip?
+      if(workingIndex >= LED_ENTRIES)
+        ledIndex = (((LED_ENTRIES * 2) - 1) - workingIndex) + (2 - i);
+
+      //at each end we'll have upto 2 leds that are off the end and so dont exist. so ignore them
+      if(ledIndex < 0 || ledIndex >= LED_ENTRIES)
+        continue;
+
+      //Get blended colour for this button
+      RGB_t thisCol = getBlendedPulseColour(i, ledIndex, frameIndex, currentCharacter);
+
+      //Set led
+      kaimana.setLED(ledList[ledIndex], thisCol.r, thisCol.g, thisCol.b);
+    }   
   }
 }
 
@@ -151,14 +291,6 @@ void tourneyModeDeactivate(void)
 	kaimana.updateALL();
 	delay( T_DELAY );	
 
-	kaimana.setALL(BLACK);
-	kaimana.updateALL();
-	delay( T_DELAY );
-	
-	kaimana.setALL(RED);
-	kaimana.updateALL();
-	delay( T_DELAY );
-	
 	kaimana.setALL(BLACK);
 	kaimana.updateALL();
 	delay( T_DELAY );
@@ -364,30 +496,13 @@ void FlashColour_Combo_Animation(int Col_R, int Col_G, int Col_B, int FlashTime)
 //-----------------------------------------------------------------------------------
 void SingleCircleAnim(int R, int G, int B)
 {
-  kaimana.setLED( LED_K1, R, G, B );
-  kaimana.updateALL();
-  delay(25);
-  kaimana.setLED( LED_K2, R, G, B );
-  kaimana.updateALL();  
-  delay(25);
-  kaimana.setLED( LED_K3, R, G, B );
-  kaimana.updateALL();
-  delay(25);
-  kaimana.setLED( LED_K4, R, G, B );
-  kaimana.updateALL(); 
-  delay(25);
-  kaimana.setLED( LED_P4, R, G, B );
-  kaimana.updateALL();
-  delay(25);
-  kaimana.setLED( LED_P3, R, G, B );
-  kaimana.updateALL();
-  delay(25);
-  kaimana.setLED( LED_P2, R, G, B );
-  kaimana.updateALL();
-  delay(25);
-  kaimana.setLED( LED_P1, R, G, B );
-  kaimana.updateALL();
-  delay(25);
+  int circleArray[] = {LED_K1, LED_K2, LED_K3, LED_K4, LED_P4, LED_P3, LED_P2, LED_P1};
+  for(int i = 0; i < 8; ++i)
+  {
+    kaimana.setLED( circleArray[i], R, G, B );
+    kaimana.updateALL();
+    delay(25);    
+  }
 }
 
 void Circle_OneColour_Combo_Animation(int loops, int R, int G, int B)
@@ -460,41 +575,15 @@ void Randomise_Combo_Animation(int NumFlash, int TimeLit, int DelayBetween,int R
 
   for(int flashIndex = 0; flashIndex < NumFlash; ++flashIndex)
   {
-    switch(random(8))
+    int randVal = random(LED_ENTRIES);
+    if(ledList[randVal] == LED_LEFT || ledList[randVal] == LED_RIGHT || ledList[randVal] == LED_UP || ledList[randVal] == LED_DOWN || ledList[randVal] == 0xFF)
     {
-      case 0:
-      {
-        kaimana.setLED( LED_P1, R, G, B );      
-      } break;
-      case 1:
-      {
-        kaimana.setLED( LED_P2, R, G, B );      
-      } break;
-      case 2:
-      {
-        kaimana.setLED( LED_P3, R, G, B );      
-      } break;
-      case 3:
-      {
-        kaimana.setLED( LED_P4, R, G, B );      
-      } break;
-      case 4:
-      {
-        kaimana.setLED( LED_K1, R, G, B );      
-      } break;
-      case 5:
-      {
-        kaimana.setLED( LED_K2, R, G, B );      
-      } break;
-      case 6:
-      {
-        kaimana.setLED( LED_K3, R, G, B );      
-      } break;
-      default:
-      {
-        kaimana.setLED( LED_K4, R, G, B );      
-      } break;
+      flashIndex--;
+      continue;
     }
+      
+    kaimana.setLED( ledList[randVal], R, G, B );      
+    
     kaimana.updateALL();  
     delay(TimeLit);
     kaimana.setALL(BLACK);
