@@ -1,4 +1,4 @@
-//  Ryu.cc
+//  Gief.cpp
 //
 //  Copyright 2023 Paradise Arcade Shop, ParadiseArcadeShop.com  
 //  All rights reserved.  Use is subject to license terms.
@@ -34,15 +34,8 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Gief::testForCharacterCombos() const
+bool Gief::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   EInputTypes P1P2Array[] = {EIT_Input_P1, EIT_Input_P2};
   EInputTypes P1P3Array[] = {EIT_Input_P1, EIT_Input_P3};
   EInputTypes P2P3Array[] = {EIT_Input_P2, EIT_Input_P3};
@@ -61,6 +54,7 @@ void Gief::testForCharacterCombos() const
     {
       CircleRGB_Combo_Animation(1);  
       FlashAllSpeedIncreasing_Combo_Animation(RED);
+      return true;
     }
   }
   
@@ -73,6 +67,7 @@ void Gief::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ))
   {
     Circle_OneColour_Combo_Animation(4, RED);  
+    return true;
   }
 
   
@@ -86,6 +81,7 @@ void Gief::testForCharacterCombos() const
   {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Medium, 1, GOLD);  
     WaveEffect_Combo_Animation(EFT_UpToDown, EFS_Medium, 1, GOLD);  
+    return true;
   }
 
 
@@ -96,6 +92,7 @@ void Gief::testForCharacterCombos() const
       kaimana.switchHistoryTest( {}, 0, P2P3Array, 2, false ) )
   {
     KnightRider_Combo_Animation(2, true, RED);  
+    return true;
   }
 
 
@@ -108,6 +105,7 @@ void Gief::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     Circle_OneColour_Combo_Animation(2, GOLD);  
+    return true;
   }
 
 
@@ -124,6 +122,9 @@ void Gief::testForCharacterCombos() const
         kaimana.switchHistoryTest( COMBO_270_DOWN_ANTICLOCKWISE, TWOSEVENTY_INPUT_COUNT, index == 0 ? P1Array : (index == 1 ? P2Array : P3Array), 1, false ) )
     {
       Circle_OneColour_Combo_Animation(2, RED);  
+      return true;
     }
   }
+
+  return false;
 } 

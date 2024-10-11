@@ -1,4 +1,4 @@
-//  Ryu.cc
+//  Ken.cpp
 //
 //  Copyright 2023 Paradise Arcade Shop, ParadiseArcadeShop.com  
 //  All rights reserved.  Use is subject to license terms.
@@ -34,15 +34,8 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Ken::testForCharacterCombos() const
+bool Ken::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   //Super Dragon punch right
   if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) ||
@@ -52,6 +45,7 @@ void Ken::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     FlashAllSpeedIncreasing_Combo_Animation(RED);
+    return true;
   }
 
   
@@ -61,6 +55,7 @@ void Ken::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 2, RED);  
+    return true;
   }
     
   //Super kicks left
@@ -69,41 +64,78 @@ void Ken::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 2, RED);  
+    return true;
   }
 
 
   //Dragon punch right
   if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P1Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(RED, 250);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P2Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(RED, 500);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_LEFT, DP_INPUT_COUNT, P3Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(RED, 750);
+    return true;
+  }
     
   //Dragon punch left
   if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P1Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(RED, 250);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P2Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(RED, 500);
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_DP_RIGHT, DP_INPUT_COUNT, P3Array, 1, false ) )
+  {
     FlashColour_Combo_Animation(RED, 750);
+    return true;
+  }
 
 
   //Fireball to the right
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, CYAN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, CYAN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_RIGHT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Fast, 0, CYAN);  
+    return true;
+  }
 
   //Fireball to the left
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P1Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, CYAN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P2Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, CYAN);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Fast, 0, CYAN);  
+    return true;
+  }
 
 
   //Hurricane kick (both sides)
@@ -115,5 +147,8 @@ void Ken::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     Circle_OneColour_Combo_Animation(1, RED);  
+    return true;
   }
+
+  return false;
 } 

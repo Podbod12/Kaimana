@@ -25,6 +25,7 @@
 //  Revised:  April   11, 2015    zonbipanda // gmail.com  -- Arduino 1.6.3 Support
 //  Revised:  Nov     15, 2023    Paul 'pod' Denning -- Bug fixes, New j4/joystick pcb support, code cleanup, improved combo detection
 //  Revised:  Mar     07, 2024    Paul 'pod' Denning -- Added static colour option for idle mode. Added fixed colour option for pressed mode. Added hold Idle colour instead of instant black for non-pressed. Can be tailored to be different for each character.
+//  Revised:  Oct     25, 2024    Paul 'pod' Denning -- Fixed 2 overflow errors, fixed incorrect idle exit when not using leds on all buttons. Added Terry and Akuma characters
 //
 
 #ifndef __kaimana_h__
@@ -61,7 +62,7 @@
 
 //possible input types for gameplay and combo matching
 //combo detection requires attack buttons be grouped together
-enum EInputTypes
+enum EInputTypes:uint8_t
 {
   EIT_INPUT_NONE,
   EIT_Input_Up,
@@ -85,6 +86,26 @@ enum EInputTypes
   EIT_INPUT_MAX,
 };
 
+//shared input arrays
+const EInputTypes P1Array[1] = {EIT_Input_P1};
+const EInputTypes P2Array[1] = {EIT_Input_P2};
+const EInputTypes P3Array[1] = {EIT_Input_P3};
+const EInputTypes K1Array[1] = {EIT_Input_K1};
+const EInputTypes K2Array[1] = {EIT_Input_K2};
+const EInputTypes K3Array[1] = {EIT_Input_K3};
+
+enum EIdleType:uint8_t
+{
+  EIT_RainbowCircling,
+  EIT_RainbowPulsing,
+  EIT_StaticColour,
+  EIT_StaticColourPulsing,
+  EIT_StaticColourCirclePulse,
+  EIT_StaticColourCircleDualPulse,
+  EIT_StaticColourPingPongPulse,
+  EIT_Disabled,
+};
+
 // number of switch inputs on kaimana
 #define  SWITCH_COUNT         15
 
@@ -105,6 +126,8 @@ enum EInputTypes
 #define  GOLD     255,150,0
 #define  BROWN    240,230,140
 #define  GREY     127,127,127
+#define  DARKGREY 60,60,60
+#define  DARKBLUE 000,000,100
 
 // RGB value structure.
 typedef struct __attribute__ ((__packed__)) {
@@ -123,9 +146,9 @@ typedef struct __attribute__ ((__packed__)) {
 
 // Input Blend structure.
 typedef struct __attribute__ ((__packed__)) {
-    unsigned long TimeSet;
-    int TimeToHold;
-    int TimeToBlend;
+    unsigned long TimeSet = 0;
+    int TimeToHold = 0;
+    int TimeToBlend = 0;
     uint8_t LEDPin;
     RGB_t SourceCol;
     RGB_t DestCol;
@@ -156,7 +179,7 @@ class Kaimana
  
  public:
     Kaimana(void);
-    void    blendLEDs(void);
+    bool    blendLEDs(bool bForceEnd = false);
     void    setLED(int index, int iR, int iG, int iB, bool bIsBlend = false, int holdTime = 0, int fadeTime = 0);
     void    setIndividualLED(int index, int iR, int iG, int iB);
     void    setALL(int iR, int iG, int iB);

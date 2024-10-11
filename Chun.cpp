@@ -1,4 +1,4 @@
-//  Ryu.cc
+//  Chun.cpp
 //
 //  Copyright 2023 Paradise Arcade Shop, ParadiseArcadeShop.com  
 //  All rights reserved.  Use is subject to license terms.
@@ -34,15 +34,8 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Chun::testForCharacterCombos() const
+bool Chun::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   //Critical (both sides)
   if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
@@ -52,6 +45,7 @@ void Chun::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K3Array, 1, false ))
   {
     FlashAllSpeedIncreasing_Combo_Animation(BLUE);
+    return true;
   }
   
   
@@ -61,6 +55,7 @@ void Chun::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 2, CYAN);  
+    return true;
   }
     
   //Super fireball left
@@ -69,6 +64,7 @@ void Chun::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_LEFT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 2, CYAN);  
+    return true;
   }
 
 
@@ -82,6 +78,7 @@ void Chun::testForCharacterCombos() const
   {
     for(int index = 0; index < 8; ++index)
       FlashColour_Combo_Animation(BLUE, 100);
+    return true;
   }
 
 
@@ -91,21 +88,42 @@ void Chun::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K3Array, 1, true ) )
   {
     KnightRider_Combo_Animation(2, false, BLUE);  
+    return true;
   }
 
   //Fireball Right
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, BLUE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, BLUE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Fast, 0, BLUE);  
+    return true;
+  }
 
   //Fireball left
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, BLUE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, BLUE);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Fast, 0, BLUE);  
+    return true;
+  }
+
+  return false;
 } 

@@ -1,4 +1,4 @@
-//  Ryu.cc
+//  Honda.cpp
 //
 //  Copyright 2023 Paradise Arcade Shop, ParadiseArcadeShop.com  
 //  All rights reserved.  Use is subject to license terms.
@@ -34,15 +34,8 @@
 #include "Characters.h"
 
 // Define combo sequences here and corresponding animations. Most complex moves should go first (eg, supers, ultras)
-void Honda::testForCharacterCombos() const
+bool Honda::testForCharacterCombos() const
 {
-  EInputTypes P1Array[] = {EIT_Input_P1};
-  EInputTypes P2Array[] = {EIT_Input_P2};
-  EInputTypes P3Array[] = {EIT_Input_P3};
-  EInputTypes K1Array[] = {EIT_Input_K1};
-  EInputTypes K2Array[] = {EIT_Input_K2};
-  EInputTypes K3Array[] = {EIT_Input_K3};
-
   //Final bout (both sides)
   if( kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K1Array, 1, false ) ||
       kaimana.switchHistoryTest( COMBO_DOUBLE_QUARTERCIRCLE_RIGHT, DOUBLE_QUARTERCIRCLE_INPUT_COUNT, K2Array, 1, false ) ||
@@ -53,6 +46,7 @@ void Honda::testForCharacterCombos() const
   {
     Circle_OneColour_Combo_Animation(2, RED); 
     FlashAllSpeedIncreasing_Combo_Animation(RED);
+    return true;
   }
 
   //killer head Ram Left  
@@ -61,6 +55,7 @@ void Honda::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_CHARGE_SUPER_RIGHT_LEFT, CHARGE_SUPER_INPUT_COUNT, K3Array, 1, true ) )
   {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 2, CYAN);      
+    return true;
   }
   
   //killer head Ram Right  
@@ -69,6 +64,7 @@ void Honda::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_CHARGE_SUPER_LEFT_RIGHT, CHARGE_SUPER_INPUT_COUNT, K3Array, 1, true ) )
   {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 2, CYAN);  
+    return true;
   }
 
 
@@ -81,33 +77,61 @@ void Honda::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_HALFCIRCLE_LEFT, HALFCIRCLE_INPUT_COUNT, K3Array, 1, false ) )
   {
     Circle_OneColour_Combo_Animation(2, YELLOW); 
+    return true;
   }
 
    
   //sumo smash
   if( kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Slow, 0, YELLOW);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Medium, 0, YELLOW);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_DOWN_UP, CHARGE_INPUT_COUNT, K3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_DownToUp, EFS_Fast, 0, YELLOW);  
+    return true;
+  }
     
 
   //headbutt to the right
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Slow, 0, YELLOW);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, YELLOW);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_LEFT_RIGHT, CHARGE_INPUT_COUNT, P3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Fast, 0, YELLOW);  
+    return true;
+  }
 
   //headbutt to the left
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P1Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Slow, 0, YELLOW);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P2Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, YELLOW);  
+    return true;
+  }
   if( kaimana.switchHistoryTest( COMBO_CHARGE_RIGHT_LEFT, CHARGE_INPUT_COUNT, P3Array, 1, true ) )
+  {
     WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Fast, 0, YELLOW);  
+    return true;
+  }
 
 
   //HHSlap (Both sides)
@@ -119,5 +143,8 @@ void Honda::testForCharacterCombos() const
       kaimana.switchHistoryTest( COMBO_QUARTERCIRCLE_LEFT, QUARTERCIRCLE_INPUT_COUNT, P3Array, 1, false ) )
   {
     Randomise_Combo_Animation(16, 60, 30, YELLOW);  
+    return true;
   }
+
+  return false;
 } 

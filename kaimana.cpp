@@ -62,19 +62,24 @@ Kaimana::Kaimana(void)
 }
 
 //Fade leds between 2 colours
-void Kaimana::blendLEDs(void)
+bool Kaimana::blendLEDs(bool bForceEnd)
 {
   unsigned long timeNow = millis();
+  bool bOneStillGoing = false;
   
   for(int index = 0; index < LED_ENTRIES; ++index)
   {
     if(_ledBlend[index].TimeSet != 0)
     {
+      bOneStillGoing = true;
+      
       //Hold time elapsed?
       unsigned long timeBlendStart = _ledBlend[index].TimeSet + (unsigned long)_ledBlend[index].TimeToHold;
-      if(timeNow > timeBlendStart)
+      if(bForceEnd || timeNow > timeBlendStart)
       {
         float blendPerc = (_ledBlend[index].TimeToBlend > 0) ? ((float)(timeNow - timeBlendStart) / (float)(_ledBlend[index].TimeToBlend)) : 1.0f;
+        if(bForceEnd)
+          blendPerc = 1.0f;
 
         //blend over?
         if(blendPerc >= 1.0f)
@@ -92,11 +97,16 @@ void Kaimana::blendLEDs(void)
       }
     }
   }
+
+  return bOneStillGoing;
 }
 
 // Sets LEDs to on in a globally defined brightness
 void Kaimana::setLED(int index, int iR, int iG, int iB, bool bIsBlend, int holdTime, int fadeTime)
 {
+  if(index == 0xFF)
+    return;
+  
   int blendIndex = 0;
   for(; blendIndex < LED_ENTRIES; ++blendIndex)
   {
@@ -149,6 +159,9 @@ void Kaimana::setLED(int index, int iR, int iG, int iB, bool bIsBlend, int holdT
 // Sets LEDs to on in a globally defined brightness
 void Kaimana::setIndividualLED(int index, int iR, int iG, int iB)
 {
+  if(index == 0xFF)
+    return;
+
   _led[index].r = iR;
   _led[index].g = iG;
   _led[index].b = iB;
@@ -436,7 +449,7 @@ boolean Kaimana::switchHistoryTest(const EInputTypes* moveArray, int moveLength,
   EInputTypes comboArray[SWITCH_HISTORY_MAX];
   for(int index = 0; index < moveLength && index < SWITCH_HISTORY_MAX; ++index)
   {
-    comboArray[index] = moveArray[index];
+    comboArray[index] = pgm_read_byte_near(&moveArray[index]);
   }
   for(int index = 0; index < triggerLength && moveLength + index < SWITCH_HISTORY_MAX; ++index)
   {
@@ -550,5 +563,10 @@ boolean Kaimana::switchHistoryTest(const EInputTypes* moveArray, int moveLength,
   //if we get here we've found every single input! Combo passed
   //Clear the history to prevent retrigger if animation is really quick
   switchHistoryClear();
+  //also clear any existing blends
+  for(int blendIndex = 0; blendIndex < LED_ENTRIES; ++blendIndex)
+  {
+    _ledBlend[blendIndex].TimeSet = 0;
+  }
   return true;
 }

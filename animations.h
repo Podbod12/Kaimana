@@ -95,7 +95,7 @@ void KnightRider_Combo_Animation(int loops, bool bTopRow, int Col_R, int Col_G, 
 void Randomise_Combo_Animation(int NumFlash, int TimeLit, int DelayBetween,int R, int G, int B); //randomly set a led for a specific time
 
 // other function prototypes
-
+void setLEDRandomColor(int index);
 int animation_idle(const Character* currentCharacter);
 void showStartup(void);
 void defaultStartup(void);

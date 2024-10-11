@@ -13,6 +13,18 @@
 
 #define  _LED_ORDER_FULL
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// START COMMON USER VARS THAT NEED SETTING ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 // Use this for J4's on your buttons
 #define LED_PER_BUTTON 4
 // Use this for J2's on your buttons
@@ -47,16 +59,60 @@
   #define  LED_COUNT   48
 #endif
 
-#define  LED_ENTRIES         12 // should match the unique entries above (and thus array size below)
-const unsigned char ledList[LED_ENTRIES] = { LED_P4, LED_P3, LED_P2, LED_P1, LED_K1, LED_K2, LED_K3, LED_K4, LED_UP, LED_DOWN, LED_LEFT, LED_RIGHT};
+#define  LED_ENTRIES         12 // should match the unique entries above (i.e the ones that arent 0xFF) (and thus array size below)
+//List all buttons that have LED's on them here. NOTE: Order here specifies the idle type "Circle pulse" order. If you have leverless and a jump button where your thumb is then you should swap the positions of up and down. you may also want to move Left to the beginning of the list
+const unsigned char ledList[LED_ENTRIES] = { LED_UP, LED_RIGHT, LED_P1, LED_P2, LED_P3, LED_P4, LED_K4, LED_K3, LED_K2, LED_K1, LED_DOWN, LED_LEFT }; 
+
+//Which button to hold to enter tourney mode (turns off all lights and effects). The commented out version is an example where I dont have a home button so I want to use k4 but since thats already in ledList directly above then I set the led to shine here as 0xFF so its ignored.
+#define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_HOME
+#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED PIN_HOME
+//#define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_K4
+//#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED 0xFF
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END COMMON USER VARS THAT NEED SETTING /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// START RARE USER VARS THAT NEED SETTING /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+//These are the 4 buttons you need to hold down to access character select. Probably only worth changing these if you dont have p4/k4 for some reason
+#define PIN_TO_SWITCH_CHARACTER_1 PIN_P1 
+#define PIN_TO_SWITCH_CHARACTER_2 PIN_P4 
+#define PIN_TO_SWITCH_CHARACTER_3 PIN_K1 
+#define PIN_TO_SWITCH_CHARACTER_4 PIN_K4 
+
+
+#define IDLE_PULSE_SPEED   0.002  // how fast Static pulse should be (lower = slower)
+#define IDLE_CIRCLEPULSE_SPEED   8  // how fast circle pulse should Travel (lower = slower). This must be a factor of 256 (so 1,2,4,8,16,32,64,128). I dont recommend going over 32
+
+
+#define  IDLE_TIMEOUT_SECONDS       1    // value in seconds before the idle animation kicks in - normally 60 or 30 seconds but set very short for testing
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END RARE USER VARS THAT NEED SETTING ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 // general definitions for delays and other customizable features
 // specific to ParadiseArcadeShop.com Kaimana board (PS360+LED)
 #define  BOOT_COLOR_DELAY         200    // value in miliseconds
 #define  FAST_COLOR_DELAY         150    // value in miliseconds
 #define  BOOT_COMPLETE_DELAY      500    // value in miliseconds
-#define  IDLE_TIMEOUT_SECONDS       1    // value in seconds - normally 60 or 30 seconds but set very short for testing
-#define  IDLE_ANIMATION_DELAY       5    // value in miliseconds - use smaller value for faster idle animation playback - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  MIN_LED_UPDATE_DELAY       5    // value in miliseconds - Gives kaimana/leds time to update correctly - Recommended you dont go below 5 or kaimana/leds cant update fast enough and will glitch
 #define  T_DELAY      			  250    
 
@@ -84,50 +140,57 @@ const RGB_t randomColors[NUM_RANDOM_COLORS] = { COLOR_RANDOM_1, COLOR_RANDOM_2, 
 #define COMBO_INPUT_COUNT_FOR_ONE_OUT_OF_TWO 7 //if the combo input is 7 or more moves then the input system will allow you to succeed if you dont miss 2 in a row window. eg LDRU would be fine for a SPD
 
 #define QUARTERCIRCLE_INPUT_COUNT 3
-const EInputTypes COMBO_QUARTERCIRCLE_RIGHT[QUARTERCIRCLE_INPUT_COUNT] = { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
-const EInputTypes COMBO_QUARTERCIRCLE_LEFT[QUARTERCIRCLE_INPUT_COUNT] = { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
+const EInputTypes COMBO_QUARTERCIRCLE_RIGHT[QUARTERCIRCLE_INPUT_COUNT] PROGMEM = { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
+const EInputTypes COMBO_QUARTERCIRCLE_LEFT[QUARTERCIRCLE_INPUT_COUNT] PROGMEM = { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
 
 #define HALFCIRCLE_INPUT_COUNT 5
-const EInputTypes COMBO_HALFCIRCLE_RIGHT[HALFCIRCLE_INPUT_COUNT] = { EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
-const EInputTypes COMBO_HALFCIRCLE_LEFT[HALFCIRCLE_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
+const EInputTypes COMBO_HALFCIRCLE_RIGHT[HALFCIRCLE_INPUT_COUNT] PROGMEM = { EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
+const EInputTypes COMBO_HALFCIRCLE_LEFT[HALFCIRCLE_INPUT_COUNT] PROGMEM = { EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
 
 #define DP_INPUT_COUNT 3
-const EInputTypes COMBO_DP_RIGHT[DP_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_Down, EIT_Input_DownRight };
-const EInputTypes COMBO_DP_LEFT[DP_INPUT_COUNT] = { EIT_Input_Left, EIT_Input_Down, EIT_Input_DownLeft };
+const EInputTypes COMBO_DP_RIGHT[DP_INPUT_COUNT] PROGMEM = { EIT_Input_Right, EIT_Input_Down, EIT_Input_DownRight };
+const EInputTypes COMBO_DP_LEFT[DP_INPUT_COUNT] PROGMEM = { EIT_Input_Left, EIT_Input_Down, EIT_Input_DownLeft };
 
 #define DOUBLE_QUARTERCIRCLE_INPUT_COUNT 6
-const EInputTypes COMBO_DOUBLE_QUARTERCIRCLE_RIGHT[DOUBLE_QUARTERCIRCLE_INPUT_COUNT] = { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
-const EInputTypes COMBO_DOUBLE_QUARTERCIRCLE_LEFT[DOUBLE_QUARTERCIRCLE_INPUT_COUNT] = { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
+const EInputTypes COMBO_DOUBLE_QUARTERCIRCLE_RIGHT[DOUBLE_QUARTERCIRCLE_INPUT_COUNT] PROGMEM = { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
+const EInputTypes COMBO_DOUBLE_QUARTERCIRCLE_LEFT[DOUBLE_QUARTERCIRCLE_INPUT_COUNT] PROGMEM = { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
+
+#define DOUBLE_DOWN_INPUT_COUNT 2
+const EInputTypes COMBO_DOUBLE_DOWN[DOUBLE_DOWN_INPUT_COUNT] PROGMEM = { EIT_Input_Down, EIT_Input_Down };
 
 #define CHARGE_INPUT_COUNT 2
-const EInputTypes COMBO_CHARGE_RIGHT_LEFT[CHARGE_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_Left };
-const EInputTypes COMBO_CHARGE_LEFT_RIGHT[CHARGE_INPUT_COUNT] = { EIT_Input_Left, EIT_Input_Right };
+const EInputTypes COMBO_CHARGE_RIGHT_LEFT[CHARGE_INPUT_COUNT] PROGMEM = { EIT_Input_Right, EIT_Input_Left };
+const EInputTypes COMBO_CHARGE_LEFT_RIGHT[CHARGE_INPUT_COUNT] PROGMEM = { EIT_Input_Left, EIT_Input_Right };
 
-const EInputTypes COMBO_CHARGE_DOWN_UP[CHARGE_INPUT_COUNT] = { EIT_Input_Down, EIT_Input_Up };
+const EInputTypes COMBO_CHARGE_DOWN_UP[CHARGE_INPUT_COUNT] PROGMEM = { EIT_Input_Down, EIT_Input_Up };
 
 #define CHARGE_SUPER_INPUT_COUNT 4
-const EInputTypes COMBO_CHARGE_SUPER_RIGHT_LEFT[CHARGE_SUPER_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_Left, EIT_Input_Right, EIT_Input_Left };
-const EInputTypes COMBO_CHARGE_SUPER_LEFT_RIGHT[CHARGE_SUPER_INPUT_COUNT] = { EIT_Input_Left, EIT_Input_Right, EIT_Input_Left, EIT_Input_Right };
+const EInputTypes COMBO_CHARGE_SUPER_RIGHT_LEFT[CHARGE_SUPER_INPUT_COUNT] PROGMEM = { EIT_Input_Right, EIT_Input_Left, EIT_Input_Right, EIT_Input_Left };
+const EInputTypes COMBO_CHARGE_SUPER_LEFT_RIGHT[CHARGE_SUPER_INPUT_COUNT] PROGMEM = { EIT_Input_Left, EIT_Input_Right, EIT_Input_Left, EIT_Input_Right };
 
 #define TWOSEVENTY_INPUT_COUNT 7 //triggers a 360 in street fighter
-const EInputTypes COMBO_270_LEFT_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] =      { EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down };
-const EInputTypes COMBO_270_UP_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] =        { EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
-const EInputTypes COMBO_270_RIGHT_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] =     { EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up };
-const EInputTypes COMBO_270_DOWN_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] =      { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right };
-const EInputTypes COMBO_270_LEFT_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] =  { EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up };
-const EInputTypes COMBO_270_UP_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] =    { EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
-const EInputTypes COMBO_270_RIGHT_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down };
-const EInputTypes COMBO_270_DOWN_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] =  { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left };
+const EInputTypes COMBO_270_LEFT_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =      { EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down };
+const EInputTypes COMBO_270_UP_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =        { EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
+const EInputTypes COMBO_270_RIGHT_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =     { EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up };
+const EInputTypes COMBO_270_DOWN_CLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =      { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right };
+const EInputTypes COMBO_270_LEFT_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =  { EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up };
+const EInputTypes COMBO_270_UP_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =    { EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
+const EInputTypes COMBO_270_RIGHT_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM = { EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down };
+const EInputTypes COMBO_270_DOWN_ANTICLOCKWISE[TWOSEVENTY_INPUT_COUNT] PROGMEM =  { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left };
 
 #define SIXTHIRTY_INPUT_COUNT 15 //triggers a 720 in street fighter
-const EInputTypes COMBO_630_LEFT_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] =      { EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down };
-const EInputTypes COMBO_630_UP_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] =        { EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
-const EInputTypes COMBO_630_RIGHT_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] =     { EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up };
-const EInputTypes COMBO_630_DOWN_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] =      { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right };
-const EInputTypes COMBO_630_LEFT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] =  { EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up };
-const EInputTypes COMBO_630_UP_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] =    { EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
-const EInputTypes COMBO_630_RIGHT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] = { EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down };
-const EInputTypes COMBO_630_DOWN_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] =  { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left };
+const EInputTypes COMBO_630_LEFT_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =      { EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down };
+const EInputTypes COMBO_630_UP_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =        { EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left };
+const EInputTypes COMBO_630_RIGHT_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =     { EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up };
+const EInputTypes COMBO_630_DOWN_CLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =      { EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right, EIT_Input_DownRight, EIT_Input_Down, EIT_Input_DownLeft, EIT_Input_Left, EIT_Input_UpLeft, EIT_Input_Up, EIT_Input_UpRight, EIT_Input_Right };
+const EInputTypes COMBO_630_LEFT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =  { EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up };
+const EInputTypes COMBO_630_UP_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =    { EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right };
+const EInputTypes COMBO_630_RIGHT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM = { EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down };
+const EInputTypes COMBO_630_DOWN_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =  { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left };
+
+#define HELL_MURDER_INPUT_COUNT 3
+const EInputTypes HELL_MURDER_INPUT_LEFT[HELL_MURDER_INPUT_COUNT] PROGMEM = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Right };
+const EInputTypes HELL_MURDER_INPUT_RIGHT[HELL_MURDER_INPUT_COUNT] PROGMEM = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Left };
 
 //Most trigger arrays are generated locally in the character but these are worth having global for ease of use
 #define TRIPLEATTACK_TRIGGER_COUNT 3
