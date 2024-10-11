@@ -48,6 +48,7 @@ bool Akuma::testForCharacterCombos() const
   //Shun goku satsu left
   if( kaimana.switchHistoryTest( HELL_MURDER_INPUT_LEFT, HELL_MURDER_INPUT_COUNT, P3K1Array, 2, false ))
   {
+    WaveEffect_Combo_Animation(EFT_RightToLeft, EFS_Medium, 0, DARKGREY);  
     Randomise_Combo_Animation(6, 120, 60, RED);
     Randomise_Combo_Animation(12, 70, 45, RED);
     Randomise_Combo_Animation(24, 30, 30, RED);
@@ -58,6 +59,7 @@ bool Akuma::testForCharacterCombos() const
   //Shun goku satsu Right
   if( kaimana.switchHistoryTest( HELL_MURDER_INPUT_RIGHT, HELL_MURDER_INPUT_COUNT, P3K1Array, 2, false ))
   {
+    WaveEffect_Combo_Animation(EFT_LeftToRight, EFS_Medium, 0, DARKGREY);  
     Randomise_Combo_Animation(6, 120, 60, RED);
     Randomise_Combo_Animation(12, 70, 45, RED);
     Randomise_Combo_Animation(24, 30, 30, RED);
