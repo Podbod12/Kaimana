@@ -1,0 +1,481 @@
+{
+  "format": "kaimana-character",
+  "version": 1,
+  "id": "ryu",
+  "name": "Ryu",
+  "notes": "Example for grey at all times but individual button will turn Red when pressed and will fade back to white when released",
+  "idle": {
+    "type": "RainbowCircling",
+    "staticColour": {
+      "default": "#000000"
+    },
+    "pulseColour": {
+      "default": "#ffffff"
+    }
+  },
+  "notPressedColour": {
+    "default": "#000000"
+  },
+  "pressedColour": {
+    "default": "random"
+  },
+  "holdMs": 0,
+  "fadeMs": 0,
+  "moves": [
+    {
+      "name": "Super Dragon punch (both sides)",
+      "inputs": [
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashAllSpeedIncreasing",
+          "colour": "#ffffff"
+        }
+      ]
+    },
+    {
+      "name": "Super fireball right",
+      "inputs": [
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "LeftToRight",
+          "speed": "Medium",
+          "loops": 2,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Super fireball left",
+      "inputs": [
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "RightToLeft",
+          "speed": "Medium",
+          "loops": 2,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Dragon punch right (P1)",
+      "inputs": [
+        {
+          "motion": "DP_LEFT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashColour",
+          "colour": "#ffffff",
+          "timeMs": 250
+        }
+      ]
+    },
+    {
+      "name": "Dragon punch right (P2)",
+      "inputs": [
+        {
+          "motion": "DP_LEFT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashColour",
+          "colour": "#ffffff",
+          "timeMs": 500
+        }
+      ]
+    },
+    {
+      "name": "Dragon punch right (P3)",
+      "inputs": [
+        {
+          "motion": "DP_LEFT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashColour",
+          "colour": "#ffffff",
+          "timeMs": 750
+        }
+      ]
+    },
+    {
+      "name": "Dragon punch left (P1)",
+      "inputs": [
+        {
+          "motion": "DP_RIGHT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashColour",
+          "colour": "#ffffff",
+          "timeMs": 250
+        }
+      ]
+    },
+    {
+      "name": "Dragon punch left (P2)",
+      "inputs": [
+        {
+          "motion": "DP_RIGHT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashColour",
+          "colour": "#ffffff",
+          "timeMs": 500
+        }
+      ]
+    },
+    {
+      "name": "Dragon punch left (P3)",
+      "inputs": [
+        {
+          "motion": "DP_RIGHT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "FlashColour",
+          "colour": "#ffffff",
+          "timeMs": 750
+        }
+      ]
+    },
+    {
+      "name": "Fireball to the right (P1)",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "LeftToRight",
+          "speed": "Slow",
+          "loops": 0,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Fireball to the right (P2)",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "LeftToRight",
+          "speed": "Medium",
+          "loops": 0,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Fireball to the right (P3)",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "LeftToRight",
+          "speed": "Fast",
+          "loops": 0,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Fireball to the left (P1)",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "RightToLeft",
+          "speed": "Slow",
+          "loops": 0,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Fireball to the left (P2)",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "RightToLeft",
+          "speed": "Medium",
+          "loops": 0,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Fireball to the left (P3)",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "RightToLeft",
+          "speed": "Fast",
+          "loops": 0,
+          "colour": "#00ffff"
+        }
+      ]
+    },
+    {
+      "name": "Hurricane kick right",
+      "inputs": [
+        {
+          "motion": "QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "CircleOneColour",
+          "loops": 1,
+          "colour": "#ffffff"
+        }
+      ]
+    }
+  ],
+  "motions": {
+    "DOUBLE_QUARTERCIRCLE_RIGHT": [
+      "Down",
+      "DownRight",
+      "Right",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "DOUBLE_QUARTERCIRCLE_LEFT": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "DP_LEFT": [
+      "Left",
+      "Down",
+      "DownLeft"
+    ],
+    "DP_RIGHT": [
+      "Right",
+      "Down",
+      "DownRight"
+    ],
+    "QUARTERCIRCLE_RIGHT": [
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "QUARTERCIRCLE_LEFT": [
+      "Down",
+      "DownLeft",
+      "Left"
+    ]
+  }
+}

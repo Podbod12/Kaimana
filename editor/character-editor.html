@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaimana Character Editor</title>
+<style>
+  :root {
+    --bg: #101014; --panel: #18181e; --panel-2: #20202a; --line: #2e2e3a; --text: #e9e9f0; --muted: #9a9aab;
+    --accent: #ff4d5e; --accent-2: #ffb020; --ok: #3ccf7a; --warn: #ffb020; --bad: #ff4d5e; --chip: #2a2a36;
+    --focus: #7aa2ff; --radius: 10px;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f3f3f6; --panel: #ffffff; --panel-2: #f6f6f9; --line: #dcdce4; --text: #16161c; --muted: #5d5d6e;
+      --chip: #ececf2; color-scheme: light;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+  header.top { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
+  header.top h1 { font-size: 16px; margin: 0; letter-spacing: .02em; white-space: nowrap; }
+  header.top h1 span { color: var(--accent); }
+  .folder { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 280px; }
+  .spacer { flex: 1; }
+  .meter { display: flex; flex-direction: column; gap: 3px; min-width: 190px; font-size: 12px; color: var(--muted); }
+  .meter .bar { height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; }
+  .meter .bar i { display: block; height: 100%; background: var(--ok); }
+  .meter.warn .bar i { background: var(--warn); }
+  .meter.bad .bar i { background: var(--bad); }
+
+  .btn { border: 1px solid var(--line); background: var(--panel-2); border-radius: 8px; padding: 6px 12px; white-space: nowrap; }
+  .btn:hover:not(:disabled) { border-color: var(--muted); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn.small { padding: 3px 8px; font-size: 12px; }
+  .btn.dice { padding: 1px 4px; font-size: 13px; line-height: 1.2; }
+  .btn.dice.on { background: var(--accent); border-color: var(--accent); }
+  .step-fields input[type=number] { width: 68px; }
+  .btn.icon { padding: 3px 7px; min-width: 28px; }
+  .btn.ghost { background: transparent; border-color: transparent; }
+  .btn.ghost:hover:not(:disabled) { background: var(--chip); }
+  .btn.danger:hover:not(:disabled) { border-color: var(--bad); color: var(--bad); }
+  .errbtn { color: var(--bad); border-color: var(--bad); }
+
+  .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 560px; gap: 16px; padding: 16px; align-items: start; }
+  @media (max-width: 1400px) { .layout { grid-template-columns: 240px minmax(0, 1fr); } .preview-col { grid-column: 1 / -1; grid-row: 1; } }
+  @media (max-width: 820px) { .layout { grid-template-columns: minmax(0, 1fr); padding: 12px; } .preview-col { grid-row: auto; } }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+  .card + .card { margin-top: 16px; }
+  .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .card h2 .spacer { flex: 1; }
+
+  .slots { display: grid; grid-template-columns: 34px 1fr; gap: 6px 8px; align-items: center; }
+  .slots label { font-weight: 600; font-size: 12px; color: var(--muted); }
+  select, input[type=text], input[type=number], textarea { background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 5px 8px; min-width: 0; }
+  select { padding-right: 4px; }
+  input[type=number] { width: 84px; }
+  textarea { width: 100%; resize: vertical; min-height: 54px; }
+
+  .charlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .charlist button { width: 100%; text-align: left; border: 0; background: transparent; padding: 6px 8px; border-radius: 7px; display: flex; gap: 8px; align-items: center; }
+  .charlist button:hover { background: var(--chip); }
+  .charlist button.sel { background: var(--chip); box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
+  .charlist .tag { margin-left: auto; font-size: 11px; color: var(--muted); }
+  .notices { margin: 16px 16px 0; padding: 10px 14px; border: 1px solid var(--warn); border-radius: var(--radius); background: var(--panel); }
+  .notices ul { margin: 6px 0; padding-left: 20px; }
+  .folderhead { font-size: 12px; color: var(--muted); margin: 10px 0 2px; font-weight: 600; }
+  .folderhead:first-of-type { margin-top: 0; }
+
+  .charhead { display: grid; grid-template-columns: 1fr 180px; gap: 8px 12px; }
+  .charhead .full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field > span { font-size: 12px; color: var(--muted); }
+  .field input[type=text] { width: 100%; }
+  .inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .hint { color: var(--muted); font-size: 12px; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 16px 0 14px; }
+  .tabs button { border: 0; background: transparent; padding: 8px 12px; border-bottom: 2px solid transparent; color: var(--muted); font-weight: 600; }
+  .tabs button.sel { color: var(--text); border-bottom-color: var(--accent); }
+
+  .colours { display: flex; flex-direction: column; gap: 14px; }
+  .cmap { border: 1px solid var(--line); border-radius: 9px; padding: 10px; background: var(--panel-2); }
+  .cmap h3 { margin: 0 0 8px; font-size: 13px; display: flex; gap: 8px; align-items: center; }
+  .cmap h3 .hint { font-weight: 400; }
+  .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; margin-top: 8px; }
+  .cchip { display: flex; align-items: center; gap: 5px; border: 1px dashed var(--line); border-radius: 7px; padding: 3px 5px; font-size: 12px; min-height: 32px; }
+  .cchip.set { border-style: solid; border-color: var(--muted); }
+  .cchip b { min-width: 34px; }
+  .cchip .inherit { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--line); padding: 0; }
+  .ccontrol { display: inline-flex; align-items: center; gap: 4px; }
+  input[type=color] { width: 30px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: none; }
+  .randomswatch { width: 30px; height: 24px; border-radius: 5px; border: 1px solid var(--line); background: conic-gradient(#7fdc00, #00dcdc, #007fff, #7f00dc, #dc007f, #ff0000, #dc7f00, #7fdc00); }
+
+  .moves { display: flex; flex-direction: column; gap: 8px; }
+  .move { border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); }
+  .move.drag-over { border-color: var(--accent); }
+  .move-head { display: flex; align-items: center; gap: 8px; padding: 6px 8px; }
+  .move-head .grip { cursor: grab; color: var(--muted); padding: 0 2px; user-select: none; }
+  .move-head .prio { font-size: 11px; color: var(--muted); width: 22px; text-align: right; font-variant-numeric: tabular-nums; }
+  .move-head .name { font-weight: 600; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; text-align: left; padding: 2px 0; }
+  .move-head .sum { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+  .move-head .swatches { display: flex; gap: 2px; }
+  .move-head .swatches i { width: 10px; height: 10px; border-radius: 3px; display: block; border: 1px solid rgba(255,255,255,.15); }
+  .move-body { border-top: 1px solid var(--line); padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .move-body h4 { margin: 4px 0 0; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .rows { display: flex; flex-direction: column; gap: 6px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 6px 8px; border-radius: 7px; background: var(--panel); border: 1px solid var(--line); }
+  .row .tools { margin-left: auto; display: inline-flex; gap: 2px; align-items: center; }
+  .row.step { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; align-items: center; }
+  .row.step .tools { margin-left: 0; }
+  @media (max-width: 700px) { .row.step { grid-template-columns: 1fr auto; } .row.step .step-fields { grid-column: 1 / -1; grid-row: 2; } }
+  .row .seq { font-size: 15px; letter-spacing: 1px; color: var(--muted); min-width: 60px; }
+  .chips { display: inline-flex; gap: 3px; flex-wrap: wrap; }
+  .chips button { border: 1px solid var(--line); background: var(--chip); border-radius: 6px; padding: 2px 7px; font-size: 12px; font-weight: 600; }
+  .chips button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chips button:disabled { opacity: .35; }
+  .step-fields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .step-fields label { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; color: var(--muted); }
+
+  .motions { display: flex; flex-direction: column; gap: 6px; }
+  .motion { display: grid; grid-template-columns: 230px 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); }
+  .motion .seq { font-size: 16px; letter-spacing: 1px; }
+  .motion.editing { grid-template-columns: 1fr; }
+  .pad { display: grid; grid-template-columns: repeat(3, 34px); gap: 4px; }
+  .pad button, .padbtns button { height: 30px; border: 1px solid var(--line); background: var(--chip); border-radius: 6px; font-size: 15px; }
+  .padbtns { display: grid; grid-template-columns: repeat(4, 40px); gap: 4px; }
+  .padbtns button { font-size: 12px; font-weight: 600; }
+
+  .preview-col { position: sticky; top: 72px; }
+  .preview canvas { width: 100%; aspect-ratio: 540 / 250; display: block; border-radius: 12px; touch-action: none; cursor: pointer; }
+  .detected { min-height: 26px; margin-top: 8px; font-weight: 600; color: var(--accent-2); }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  kbd { background: var(--chip); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font: 11px ui-monospace, monospace; color: var(--text); }
+
+  .welcome { max-width: 760px; margin: 48px auto; padding: 0 16px; }
+  .welcome h2 { font-size: 26px; margin: 0 0 8px; }
+  .welcome ol { padding-left: 20px; }
+  .welcome .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+  .note { border-left: 3px solid var(--accent-2); padding: 8px 12px; background: var(--panel); border-radius: 0 8px 8px 0; color: var(--muted); }
+
+  .errors { position: fixed; right: 16px; top: 64px; width: min(460px, calc(100vw - 32px)); max-height: 60vh; overflow: auto; z-index: 10; box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+  .errors li { margin-bottom: 4px; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,.35); z-index: 20; max-width: calc(100vw - 32px); }
+  .toast.ok { border-color: var(--ok); }
+  .toast.bad { border-color: var(--bad); }
+  .empty { color: var(--muted); padding: 12px; text-align: center; border: 1px dashed var(--line); border-radius: 9px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Kaimana <span>Character Editor</span></h1>
+  <div class="folder" id="folder"></div>
+  <div class="spacer"></div>
+  <div class="meter hidden" id="meter" title=""><div id="meterText"></div><div class="bar"><i id="meterBar"></i></div></div>
+  <button class="btn small hidden" id="undoBtn" title="Undo (Ctrl+Z)">Undo</button>
+  <button class="btn small hidden" id="redoBtn" title="Redo (Ctrl+Y)">Redo</button>
+  <button class="btn small errbtn hidden" id="errBtn"></button>
+  <button class="btn primary hidden" id="saveBtn" title="Save (Ctrl+S)">Save</button>
+</header>
+
+<div id="app"></div>
+<div class="card errors hidden" id="errors"></div>
+
+<datalist id="namedColours"></datalist>
+<input type="file" id="folderInput" webkitdirectory multiple class="hidden">
+
+<script src="codegen.js"></script>
+<script src="sim.js"></script>
+<script>
+'use strict';
+const cg = window.KaimanaCodegen;
+const SIM = window.KaimanaSimulator;
+if (!cg || !SIM) document.body.innerHTML = '<p style="padding:24px">codegen.js or sim.js could not be loaded. Keep character-editor.html in the editor folder next to them.</p>';
+
+const GLYPH = { Up: '↑', UpRight: '↗', Right: '→', DownRight: '↘', Down: '↓', DownLeft: '↙', Left: '←', UpLeft: '↖' };
+const IDLE_HELP = {
+  RainbowCircling: 'Rainbow that rotates through every LED.',
+  RainbowPulsing: 'Every button shows the same colour, cycling through the rainbow.',
+  StaticColour: 'Buttons show the idle static colours and don’t move.',
+  StaticColourPulsing: 'Idle static colours that fade down and back up.',
+  StaticColourCirclePulse: 'Idle static colours with a pulse of the pulse colour travelling around the buttons.',
+  StaticColourCircleDualPulse: 'Like circle pulse but with two pulses on opposite sides.',
+  StaticColourPingPongPulse: 'A single pulse that bounces back and forth along the buttons.',
+  Disabled: 'No idle animation. Buttons stay at their not pressed colours.',
+};
+const SLOT_BUTTONS = ['P1', 'P2', 'P3', 'P4', 'K1', 'K2', 'K3', 'K4'];
+const KEYMAP = { ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right', w: 'Up', s: 'Down', a: 'Left', d: 'Right',
+  u: 'P1', i: 'P2', o: 'P3', p: 'P4', j: 'K1', k: 'K2', l: 'K3', ';': 'K4' };
+
+const state = {
+  doc: null, dir: null, natives: null, simConfig: SIM.DEFAULT_CONFIG,
+  selected: null, tab: 'look', dirty: false, expanded: new Set(), editingMotion: null,
+  undo: [], redo: [], lastSnapshot: null, sourceName: '', showErrors: false, loaded: null, notices: [],
+};
+
+// ---------- tiny DOM helper ----------
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  for (const k in (attrs || {})) {
+    const v = attrs[k];
+    if (v === null || v === undefined || v === false) continue;
+    if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === 'class') el.className = v;
+    else if (k === 'style') el.style.cssText = v;
+    else if (k === 'value') el.value = v;
+    else if (k === 'checked') el.checked = !!v;
+    else if (k === 'html') el.innerHTML = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  const add = c => {
+    if (c === null || c === undefined || c === false) return;
+    if (Array.isArray(c)) c.forEach(add);
+    else el.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
+  };
+  children.forEach(add);
+  return el;
+}
+const $ = id => document.getElementById(id);
+function toast(msg, kind) {
+  const t = h('div', { class: 'toast ' + (kind || '') }, msg);
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), kind === 'bad' ? 6000 : 3500);
+}
+
+// ---------- model helpers ----------
+const keyOf = c => cg.characterKey(c);
+const currentChar = () => state.doc && state.doc.characters.find(c => keyOf(c) === state.selected);
+function slugify(name, folder) {
+  let s = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 24);
+  if (!/^[a-z]/.test(s)) s = 'c_' + s;
+  let id = s, n = 2;
+  while (state.doc.characters.some(c => c.id === id && (c.folder || '') === (folder || ''))) id = s + '_' + n++;
+  return id;
+}
+function motionUsage(name) {
+  let n = 0;
+  state.doc.characters.forEach(c => (c.moves || []).forEach(m => m.inputs.forEach(t => { if (t.motion === name) n++; })));
+  return n;
+}
+function seqText(seq) { return seq.length ? seq.map(i => GLYPH[i] || ' ' + i + ' ').join('') : '(buttons only)'; }
+function moveSummary(m) {
+  const motions = [...new Set(m.inputs.map(t => t.motion))];
+  const trig = [...new Set(m.inputs.map(t => t.triggers.join('+')))];
+  const charge = m.inputs.some(t => t.charge) ? ' · charge' : '';
+  return `${motions.slice(0, 2).join(' / ')}${motions.length > 2 ? ' …' : ''} + ${trig.slice(0, 3).join(', ')}${trig.length > 3 ? ' …' : ''}${charge}`;
+}
+
+// ---------- change tracking / undo ----------
+let snapTimer = null;
+function changed(opts) {
+  opts = opts || {};
+  state.dirty = true;
+  clearTimeout(snapTimer);
+  if (opts.coalesce) snapTimer = setTimeout(snapshot, 500); else snapshot();
+  if (opts.render !== false) render(); else renderHeader();
+}
+function snapshot() {
+  const s = JSON.stringify(state.doc);
+  if (s === state.lastSnapshot) return;
+  if (state.lastSnapshot !== null) { state.undo.push(state.lastSnapshot); if (state.undo.length > 150) state.undo.shift(); }
+  state.redo = [];
+  state.lastSnapshot = s;
+  renderHeader();
+}
+function restore(s) {
+  state.doc = JSON.parse(s);
+  state.lastSnapshot = s;
+  state.expanded.clear();
+  if (!currentChar()) state.selected = state.doc.characters[0] && keyOf(state.doc.characters[0]);
+  state.dirty = true;
+  render();
+  syncPreview();
+}
+function undo() { clearTimeout(snapTimer); snapshot(); if (!state.undo.length) return; state.redo.push(state.lastSnapshot); restore(state.undo.pop()); }
+function redo() { if (!state.redo.length) return; state.undo.push(state.lastSnapshot); restore(state.redo.pop()); }
+
+// ---------- files ----------
+// The editor reads and writes these files in the sketch folder:
+//   characters/profiles.json, characters/motions.json, characters/<Folder>/<id>.json  (see assembleProject in codegen.js)
+//   GeneratedCharacters.cpp (written), kaimana_custom.h, Characters.h and src/**.h (read only)
+const hasFS = 'showDirectoryPicker' in window;
+const wantedFile = p => p === 'Characters.h' || p === 'kaimana_custom.h' || p === 'characters.json' || p === 'GeneratedCharacters.cpp' ||
+  p === cg.PROFILES_FILE || p === cg.MOTIONS_FILE || cg.isCharacterFile(p) || (p.startsWith('src/') && /\.(h|hpp|hh)$/i.test(p));
+
+async function readText(dir, name) {
+  try { return await (await (await dir.getFileHandle(name)).getFile()).text(); } catch (e) { return null; }
+}
+async function dirFor(root, path, create) {
+  let dir = root;
+  const parts = path.split('/');
+  for (const part of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(part, { create });
+  return { dir, name: parts[parts.length - 1] };
+}
+async function writePath(root, path, text) {
+  const { dir, name } = await dirFor(root, path, true);
+  const w = await (await dir.getFileHandle(name, { create: true })).createWritable();
+  await w.write(text);
+  await w.close();
+}
+async function removePath(root, path) {
+  const parts = path.split('/');
+  const dirs = [root];
+  for (const part of parts.slice(0, -1)) dirs.push(await dirs[dirs.length - 1].getDirectoryHandle(part));
+  await dirs[dirs.length - 1].removeEntry(parts[parts.length - 1]);
+  // remove folders left empty (removeEntry refuses if they still have files in), but never the top characters folder
+  for (let i = dirs.length - 1; i >= 2; --i) {
+    try { await dirs[i - 1].removeEntry(parts[i - 1]); } catch (e) { break; }
+  }
+}
+
+// Reads the wanted files from a folder handle into a Map of path -> text
+async function readSketchFromHandle(root) {
+  const files = new Map();
+  for (const name of ['Characters.h', 'kaimana_custom.h', 'characters.json', 'GeneratedCharacters.cpp']) {
+    const t = await readText(root, name);
+    if (t !== null) files.set(name, t);
+  }
+  const walk = async (handle, rel) => {
+    for await (const entry of handle.values()) {
+      const p = rel + '/' + entry.name;
+      if (entry.kind === 'directory') await walk(entry, p);
+      else if (wantedFile(p)) files.set(p, await (await entry.getFile()).text());
+    }
+  };
+  for (const top of ['src', cg.PROJECT_DIR]) {
+    try { await walk(await root.getDirectoryHandle(top), top); } catch (e) { /* folder not there */ }
+  }
+  return files;
+}
+
+// Reads the wanted files from an <input webkitdirectory> file list (browsers without folder write access)
+async function readSketchFromFileList(list) {
+  const all = [...list];
+  // work out which part of the paths is the sketch folder, whatever folder the user picked
+  const marker = all.map(f => f.webkitRelativePath).find(p => /(^|\/)(kaimana-zero\.ino|characters\/profiles\.json|characters\.json)$/.test(p));
+  if (!marker) return null;
+  const prefix = marker.replace(/(kaimana-zero\.ino|characters\/profiles\.json|characters\.json)$/, '');
+  const files = new Map();
+  for (const f of all) {
+    if (!f.webkitRelativePath.startsWith(prefix)) continue;
+    const p = f.webkitRelativePath.slice(prefix.length);
+    if (wantedFile(p)) files.set(p, await f.text());
+  }
+  return { files, name: prefix.replace(/\/$/, '').split('/').pop() || 'sketch' };
+}
+
+function idb(mode, fn) {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('kaimana-editor', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => {
+      const tx = req.result.transaction('kv', mode);
+      const r = fn(tx.objectStore('kv'));
+      tx.oncomplete = () => resolve(r && r.result);
+      tx.onerror = () => reject(tx.error);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+const rememberDir = dir => idb('readwrite', s => s.put(dir, 'dir')).catch(() => {});
+const recallDir = () => idb('readonly', s => s.get('dir')).catch(() => null);
+
+async function openFolder(dir) {
+  try {
+    if (!dir) dir = await window.showDirectoryPicker({ id: 'kaimana-sketch', mode: 'readwrite' });
+    else if ((await dir.requestPermission({ mode: 'readwrite' })) !== 'granted') return;
+  } catch (e) { if (e.name !== 'AbortError') toast('Could not open folder: ' + e.message, 'bad'); return; }
+  const files = await readSketchFromHandle(dir);
+  if (!hasProject(files)) {
+    const inEditor = await readText(dir, 'character-editor.html');
+    toast(inEditor ? 'That is the editor folder. Pick the folder above it, the one with kaimana-zero.ino in it.'
+      : 'No characters folder in there. Pick the sketch folder that has kaimana-zero.ino in it.', 'bad');
+    return;
+  }
+  state.dir = dir;
+  rememberDir(dir);
+  loadSketch(files, dir.name);
+}
+
+function openReadOnlyFolder() { $('folderInput').click(); }
+$('folderInput').addEventListener('change', async e => {
+  const picked = await readSketchFromFileList(e.target.files);
+  e.target.value = '';
+  if (!picked || !hasProject(picked.files)) { toast('No characters folder in there. Pick the sketch folder that has kaimana-zero.ino in it.', 'bad'); return; }
+  state.dir = null;
+  loadSketch(picked.files, picked.name + ' (downloads on save)');
+});
+
+const hasProject = files => files.has(cg.PROFILES_FILE) || files.has('characters.json') || [...files.keys()].some(cg.isCharacterFile);
+const nativeOptions = () => ({ natives: state.natives || undefined });
+
+function loadSketch(files, sourceName) {
+  const characterFiles = [...files].filter(([p]) => cg.isCharacterFile(p)).map(([path, text]) => ({ path, text }));
+  const project = cg.assembleProject({
+    profiles: files.get(cg.PROFILES_FILE) || null, motions: files.get(cg.MOTIONS_FILE) || null,
+    characters: characterFiles, legacy: files.get('characters.json') || null,
+  });
+  if (!project.doc) { toast(project.warnings.join(' '), 'bad'); return; }
+  // remember exactly what is on disk so saving only touches files that changed, and can remove old ones
+  state.loaded = new Map([...files].filter(([p]) => p === cg.PROFILES_FILE || p === cg.MOTIONS_FILE || cg.isCharacterFile(p) || p === 'GeneratedCharacters.cpp' ||
+    (p === 'characters.json' && !characterFiles.length)));
+  const headers = [...files].filter(([p]) => p === 'Characters.h' || p.startsWith('src/')).map(([path, text]) => ({ path, text }));
+  state.sourceName = sourceName;
+  state.notices = project.warnings;
+  load(project.doc, headers, files.get('kaimana_custom.h') || null);
+  if (project.warnings.length) { state.dirty = true; render(); }
+}
+
+function load(doc, headers, customH) {
+  state.doc = doc;
+  state.natives = headers ? cg.findNativeClasses(headers) : null;
+  state.simConfig = SIM.parseConfig(customH);
+  const first = doc.characters.find(c => keyOf(c) === doc.slots[0]) || doc.characters[0];
+  state.selected = first ? keyOf(first) : null;
+  state.undo = []; state.redo = []; state.lastSnapshot = JSON.stringify(doc); state.dirty = false;
+  state.expanded.clear();
+  sim.setConfig(state.simConfig);
+  render();
+  syncPreview();
+}
+
+// Minimal zip writer (files stored uncompressed) for browsers that can't write to folders
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; ++n) { let c = n; for (let k = 0; k < 8; ++k) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; ++i) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function makeZip(entries) {
+  const enc = new TextEncoder();
+  const chunks = [], central = [];
+  let offset = 0;
+  for (const { path, text } of entries) {
+    const name = enc.encode(path), data = enc.encode(text), crc = crc32(data);
+    const local = new DataView(new ArrayBuffer(30));
+    [[0, 0x04034b50, 4], [4, 20, 2], [6, 0x0800, 2], [8, 0, 2], [10, 0, 2], [12, 0x21, 2], [14, crc, 4], [18, data.length, 4], [22, data.length, 4], [26, name.length, 2], [28, 0, 2]]
+      .forEach(([o, v, n]) => (n === 4 ? local.setUint32(o, v, true) : local.setUint16(o, v, true)));
+    chunks.push(local, name, data);
+    const cd = new DataView(new ArrayBuffer(46));
+    [[0, 0x02014b50, 4], [4, 20, 2], [6, 20, 2], [8, 0x0800, 2], [10, 0, 2], [12, 0, 2], [14, 0x21, 2], [16, crc, 4], [20, data.length, 4], [24, data.length, 4],
+      [28, name.length, 2], [30, 0, 2], [32, 0, 2], [34, 0, 2], [36, 0, 2], [38, 0, 4], [42, offset, 4]]
+      .forEach(([o, v, n]) => (n === 4 ? cd.setUint32(o, v, true) : cd.setUint16(o, v, true)));
+    central.push(cd, name);
+    offset += 30 + name.length + data.length;
+  }
+  const cdSize = central.reduce((a, c) => a + c.byteLength, 0);
+  const end = new DataView(new ArrayBuffer(22));
+  [[0, 0x06054b50, 4], [4, 0, 2], [6, 0, 2], [8, entries.length, 2], [10, entries.length, 2], [12, cdSize, 4], [16, offset, 4], [20, 0, 2]]
+    .forEach(([o, v, n]) => (n === 4 ? end.setUint32(o, v, true) : end.setUint16(o, v, true)));
+  return new Blob([...chunks, ...central, end], { type: 'application/zip' });
+}
+function downloadBlob(name, blob) {
+  const a = h('a', { href: URL.createObjectURL(blob), download: name });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function save() {
+  if (!state.doc) return;
+  clearTimeout(snapTimer); snapshot();
+  const result = cg.generate(state.doc, nativeOptions());
+  if (result.errors.length) { state.showErrors = true; renderHeader(); toast('Fix the problems listed before saving', 'bad'); return; }
+  const files = cg.splitProject(state.doc);
+  files['GeneratedCharacters.cpp'] = result.code;
+  const loaded = state.loaded || new Map();
+  const changed = Object.keys(files).filter(p => loaded.get(p) !== files[p]);
+  const removed = [...loaded.keys()].filter(p => !(p in files));
+  if (!changed.length && !removed.length) { state.dirty = false; renderHeader(); toast('Nothing has changed since the last save', 'ok'); return; }
+  if (state.dir) {
+    try {
+      if ((await state.dir.requestPermission({ mode: 'readwrite' })) !== 'granted') throw new Error('permission denied');
+      for (const p of changed) await writePath(state.dir, p, files[p]);
+      for (const p of removed) await removePath(state.dir, p);
+    } catch (e) { toast('Save failed: ' + e.message, 'bad'); return; }
+    const chars = changed.filter(cg.isCharacterFile).length;
+    toast(`Saved ${changed.length} file${changed.length === 1 ? '' : 's'}${chars ? ` (${chars} character${chars === 1 ? '' : 's'})` : ''}${removed.length ? `, removed ${removed.join(', ')}` : ''}. Now compile and upload in the Arduino IDE.`, 'ok');
+  } else {
+    downloadBlob('kaimana-characters.zip', makeZip(changed.map(p => ({ path: p, text: files[p] }))));
+    toast(`Downloaded kaimana-characters.zip with the ${changed.length} changed file${changed.length === 1 ? '' : 's'}. Unzip it into your sketch folder (next to kaimana-zero.ino), replacing the old files.` +
+      (removed.length ? ` Also delete: ${removed.join(', ')}` : ''), 'ok');
+  }
+  state.loaded = new Map(Object.entries(files));
+  state.notices = [];
+  state.dirty = false;
+  render();
+}
+
+// ---------- rendering ----------
+function renderHeader() {
+  const doc = state.doc;
+  const on = !!doc;
+  ['meter', 'undoBtn', 'redoBtn', 'saveBtn'].forEach(id => $(id).classList.toggle('hidden', !on));
+  $('folder').textContent = on ? (state.dir ? '📁 ' : '📄 ') + state.sourceName + (state.dirty ? '  •  unsaved changes' : '') : '';
+  if (!on) { $('errBtn').classList.add('hidden'); $('errors').classList.add('hidden'); return; }
+  $('undoBtn').disabled = !state.undo.length && JSON.stringify(doc) === state.lastSnapshot;
+  $('redoBtn').disabled = !state.redo.length;
+  const errors = cg.validate(doc, nativeOptions());
+  $('errBtn').classList.toggle('hidden', !errors.length);
+  $('errBtn').textContent = `⚠ ${errors.length} problem${errors.length === 1 ? '' : 's'}`;
+  $('saveBtn').textContent = state.dir ? 'Save' : 'Download zip';
+  $('saveBtn').disabled = !!errors.length;
+  const panel = $('errors');
+  panel.classList.toggle('hidden', !(state.showErrors && errors.length));
+  panel.replaceChildren(h('h2', null, 'Problems to fix before saving', h('span', { class: 'spacer' }),
+    h('button', { class: 'btn small ghost', onclick: () => { state.showErrors = false; renderHeader(); } }, 'Close')),
+  h('ul', null, errors.slice(0, 60).map(e => h('li', null, e))));
+  if (!errors.length) {
+    const est = cg.estimate(doc);
+    const pct = est.estimatedFlash / est.flashLimit;
+    $('meter').className = 'meter' + (pct > 0.97 ? ' bad' : pct > 0.9 ? ' warn' : '');
+    $('meterText').textContent = `Flash ≈ ${est.estimatedFlash.toLocaleString()} / ${est.flashLimit.toLocaleString()} bytes (${Math.round(pct * 100)}%)`;
+    $('meterBar').style.width = Math.min(100, pct * 100) + '%';
+    $('meter').title = `Estimate only. The Arduino IDE shows the real number when you compile.\n${est.uniqueProfiles} unique profiles, ${est.counts.moves} moves, ${est.tableBytes} bytes of character tables` +
+      (est.nativeProfiles ? `\nIncludes a rough ${est.nativeProfiles} × 1500 bytes for hand written C++ characters` : '');
+  }
+}
+
+function render() {
+  renderHeader();
+  const app = $('app');
+  if (!state.doc) { app.replaceChildren(renderWelcome()); return; }
+  const scrollY = window.scrollY;
+  const active = document.activeElement && document.activeElement.dataset.key;
+  app.replaceChildren(...[renderNotices(), h('div', { class: 'layout' },
+    h('aside', null, renderSlots(), renderCharacterList()),
+    h('main', null, renderCharacter()),
+    previewColumn)].filter(Boolean)); // replaceChildren would turn a null into the text "null"
+  window.scrollTo(0, scrollY);
+  if (active) { const el = app.querySelector(`[data-key="${CSS.escape(active)}"]`); if (el) el.focus(); }
+}
+
+// Things assembleProject fixed up while loading (duplicate ids, clashing motions). Saving writes the fixes back.
+function renderNotices() {
+  if (!state.notices || !state.notices.length) return null;
+  return h('div', { class: 'notices' },
+    h('div', { class: 'inline' }, h('b', null, 'While loading the character files:'), h('span', { class: 'spacer' }),
+      h('button', { class: 'btn small ghost', onclick: () => { state.notices = []; render(); } }, 'Dismiss')),
+    h('ul', null, state.notices.map(n => h('li', null, n))),
+    h('p', { class: 'hint', style: 'margin:0' }, 'Save to write these changes to the files.'));
+}
+
+function renderWelcome() {
+  return h('div', { class: 'welcome' },
+    h('h2', null, 'Edit your Kaimana characters without touching the code'),
+    h('p', null, 'This page edits the character files in the characters folder of your Kaimana sketch and writes GeneratedCharacters.cpp for you. When you’ve saved, open the sketch in the Arduino IDE and hit Upload.'),
+    h('p', null, 'Each character is its own file (characters/<Folder>/<id>.json), so to add a character someone sent you, just drop their file into the characters folder (or a folder inside it) and reopen the editor.'),
+    h('ol', null,
+      h('li', null, 'Click ', h('b', null, 'Open sketch folder'), ' and pick the folder with ', h('code', null, 'kaimana-zero.ino'), ' in it (the one above this editor folder).'),
+      h('li', null, 'Pick the 8 profiles, then edit colours, idle modes and special moves. The preview shows the result, and you can type moves on your keyboard to test them.'),
+      h('li', null, 'Click ', h('b', null, 'Save'), ', then compile and upload in the Arduino IDE.')),
+    h('div', { class: 'actions' },
+      hasFS ? h('button', { class: 'btn primary', onclick: () => openFolder() }, 'Open sketch folder') : null,
+      hasFS && state.rememberedDir ? h('button', { class: 'btn', onclick: () => openFolder(state.rememberedDir) }, `Reopen “${state.rememberedDir.name}”`) : null,
+      hasFS ? null : h('button', { class: 'btn primary', onclick: openReadOnlyFolder }, 'Open sketch folder…')),
+    hasFS ? null : h('p', { class: 'note' }, 'Your browser can’t save into folders (only Chrome and Edge can). You can still edit everything: pick the sketch folder (the one with kaimana-zero.ino in it) and Save downloads a zip of the changed files to unzip into the sketch folder.'));
+}
+
+function renderSlots() {
+  const doc = state.doc;
+  const natives = state.natives || {};
+  const nativeGroups = groupBy(Object.keys(natives).sort(), n => cg.nativeFolder(natives[n]));
+  const charGroups = groupBy(doc.characters, c => c.folder || '');
+  const slotGrid = h('div', { class: 'slots' });
+  doc.slots.forEach((s, i) => {
+    const option = (value, label) => h('option', { value, selected: s === value ? 'selected' : null }, label);
+    const missing = String(s).startsWith('native:') && !(s.slice(7) in natives) ? s.slice(7) : null;
+    const sel = h('select', {
+      'aria-label': `Profile ${i + 1} (${SLOT_BUTTONS[i]})`,
+      onchange: e => { doc.slots[i] = e.target.value; changed(); },
+    },
+    charGroups.map(([folder, chars]) => (folder
+      ? h('optgroup', { label: folder }, chars.map(c => option(keyOf(c), c.name || c.id)))
+      : chars.map(c => option(keyOf(c), c.name || c.id)))),
+    nativeGroups.map(([folder, names]) => h('optgroup', { label: `C++ · ${folder}` }, names.map(n => option('native:' + n, 'C++: ' + n)))),
+    missing ? h('optgroup', { label: 'C++ (not found)' }, option(s, 'C++: ' + missing)) : null);
+    slotGrid.append(h('label', null, SLOT_BUTTONS[i]), sel);
+  });
+  return h('section', { class: 'card' },
+    h('h2', null, 'Profiles on the stick'),
+    slotGrid,
+    h('p', { class: 'hint', style: 'margin:10px 0 0' }, 'Hold P1+P4+K1+K4 on the stick, then press a button to switch profile. Using a character twice only costs its memory once.'));
+}
+
+function renderCharacterList() {
+  const doc = state.doc;
+  return h('section', { class: 'card' },
+    h('h2', null, 'Characters', h('span', { class: 'spacer' }),
+      h('button', { class: 'btn small', onclick: addCharacter }, '+ New')),
+    groupBy(doc.characters, c => c.folder || '').map(([folder, chars]) => [
+      folder ? h('h3', { class: 'folderhead' }, '📁 ' + folder) : null,
+      h('ul', { class: 'charlist' }, chars.map(c => {
+        const slots = doc.slots.map((s, i) => (s === keyOf(c) ? SLOT_BUTTONS[i] : null)).filter(Boolean);
+        return h('li', null, h('button', {
+          class: keyOf(c) === state.selected ? 'sel' : '',
+          onclick: () => { state.selected = keyOf(c); state.expanded.clear(); state.editingMotion = null; render(); syncPreview(); },
+        }, c.name || c.id, h('span', { class: 'tag' }, slots.join(' '))));
+      }))]));
+}
+
+// Groups items by key in first seen order, with the no folder group ('') first. Returns [[key, items], ...]
+function groupBy(items, keyOf) {
+  const groups = new Map();
+  for (const item of items) {
+    const k = keyOf(item);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(item);
+  }
+  const all = [...groups];
+  return all.filter(g => g[0] === '').concat(all.filter(g => g[0] !== ''));
+}
+const allFolders = () => [...new Set(state.doc.characters.map(c => c.folder).filter(Boolean))].sort();
+
+function addCharacter() {
+  const name = prompt('Name for the new character?', 'New character');
+  if (!name) return;
+  const folder = (currentChar() || {}).folder;
+  const c = cg.newCharacter(slugify(name, folder), name.trim(), folder);
+  if (!c.folder) delete c.folder;
+  state.doc.characters.push(c);
+  state.selected = keyOf(c);
+  state.tab = 'look';
+  changed();
+  syncPreview();
+}
+function duplicateCharacter(c) {
+  const copy = JSON.parse(JSON.stringify(c));
+  copy.name = (c.name || c.id) + ' copy';
+  copy.id = slugify(copy.name, c.folder);
+  state.doc.characters.splice(state.doc.characters.indexOf(c) + 1, 0, copy);
+  state.selected = keyOf(copy);
+  changed();
+  syncPreview();
+}
+function deleteCharacter(c) {
+  if (state.doc.slots.includes(keyOf(c))) { toast(`${c.name} is in a profile slot. Put a different character in that slot first.`, 'bad'); return; }
+  if (!confirm(`Delete ${c.name || c.id}? (You can undo this.)`)) return;
+  state.doc.characters.splice(state.doc.characters.indexOf(c), 1);
+  state.selected = state.doc.characters[0] && keyOf(state.doc.characters[0]);
+  changed();
+  syncPreview();
+}
+
+function renderCharacter() {
+  const c = currentChar();
+  if (!c) return h('div', { class: 'card empty' }, 'No characters yet. Click “+ New”.');
+  const idInput = h('input', {
+    type: 'text', value: c.id, 'data-key': 'char-id', spellcheck: 'false',
+    onchange: e => {
+      const v = e.target.value.trim();
+      if (v === c.id) return;
+      if (!/^[a-z][a-z0-9_]{0,30}$/.test(v)) { toast('Ids use lower case letters, numbers and _ and start with a letter', 'bad'); e.target.value = c.id; return; }
+      if (state.doc.characters.some(o => o !== c && o.id === v && (o.folder || '') === (c.folder || ''))) { toast('Another character in the same folder already uses that id', 'bad'); e.target.value = c.id; return; }
+      const oldKey = keyOf(c);
+      c.id = v;
+      state.doc.slots = state.doc.slots.map(s => (s === oldKey ? keyOf(c) : s));
+      state.selected = keyOf(c);
+      changed();
+    },
+  });
+  return h('div', null,
+    h('section', { class: 'card' },
+      h('div', { class: 'charhead' },
+        h('label', { class: 'field' }, h('span', null, 'Name'),
+          h('input', { type: 'text', value: c.name || '', 'data-key': 'char-name', oninput: e => { c.name = e.target.value; changed({ render: false, coalesce: true }); }, onchange: () => render() })),
+        h('label', { class: 'field' }, h('span', null, 'Id (file name, and used in the generated code)'), idInput),
+        h('label', { class: 'field full' }, h('span', null, 'Folder (eg the game they are from). Saved as characters/<folder>/<id>.json, leave empty for none'),
+          h('input', { type: 'text', value: c.folder || '', list: 'folderList', 'data-key': 'char-folder', spellcheck: 'false', placeholder: 'StreetFighter6',
+            onchange: e => {
+              const v = e.target.value.trim();
+              const err = v ? cg.folderPathError(v) : null;
+              if (err) { toast(`Folder name ${err}`, 'bad'); e.target.value = c.folder || ''; return; }
+              if (state.doc.characters.some(o => o !== c && o.id === c.id && (o.folder || '') === v)) { toast(`There is already a character with the id ${c.id} in that folder`, 'bad'); e.target.value = c.folder || ''; return; }
+              const oldKey = keyOf(c);
+              if (v) c.folder = v; else delete c.folder;
+              state.doc.slots = state.doc.slots.map(s => (s === oldKey ? keyOf(c) : s));
+              state.selected = keyOf(c);
+              changed();
+            } }),
+          h('datalist', { id: 'folderList' }, allFolders().map(f => h('option', { value: f })))),
+        h('label', { class: 'field full' }, h('span', null, 'Notes'),
+          h('textarea', { rows: 2, 'data-key': 'char-notes', oninput: e => { c.notes = e.target.value; changed({ render: false, coalesce: true }); } }, c.notes || '')),
+        h('div', { class: 'inline full' },
+          h('button', { class: 'btn small', onclick: () => duplicateCharacter(c) }, 'Duplicate'),
+          h('button', { class: 'btn small danger', onclick: () => deleteCharacter(c) }, 'Delete'))),
+      h('div', { class: 'tabs', role: 'tablist' },
+        [['look', 'Look & idle'], ['moves', `Special moves (${(c.moves || []).length})`], ['motions', 'Motion library']].map(([k, label]) =>
+          h('button', { role: 'tab', class: state.tab === k ? 'sel' : '', 'aria-selected': state.tab === k ? 'true' : 'false', onclick: () => { state.tab = k; render(); } }, label))),
+      state.tab === 'look' ? renderLook(c) : state.tab === 'moves' ? renderMoves(c) : renderMotions()));
+}
+
+// ----- colours -----
+function colourControl(value, allowRandom, onChange, key) {
+  const isRandom = value === 'random';
+  const picker = isRandom ? h('span', { class: 'randomswatch', title: 'Random colour each press' })
+    : h('input', { type: 'color', value: value, list: 'namedColours', 'data-key': key, title: cg.colourName(value),
+      oninput: e => onChange(e.target.value, true), onchange: e => onChange(e.target.value, false) });
+  if (!allowRandom) return picker;
+  return h('span', { class: 'ccontrol' }, picker,
+    h('button', { class: 'btn icon small dice' + (isRandom ? ' on' : ''), 'aria-pressed': isRandom ? 'true' : 'false',
+      title: isRandom ? 'Random colour. Click to use a fixed colour instead' : 'Use a random colour instead',
+      onclick: () => onChange(isRandom ? '#ffffff' : 'random', false) }, '🎲'));
+}
+
+function colourMapEditor(title, help, getMap, setMap, fallback, allowRandom, keyPrefix) {
+  const map = getMap() || {};
+  const def = map.default !== undefined ? map.default : fallback;
+  const set = (k, v, live) => {
+    const m = Object.assign({}, getMap() || {});
+    m[k] = v;
+    setMap(m);
+    changed({ render: !live, coalesce: live });
+  };
+  const clear = k => { const m = Object.assign({}, getMap() || {}); delete m[k]; setMap(m); changed(); };
+  const leds = state.simConfig.leds;
+  const slots = cg.COLOUR_SLOTS.filter(s => leds[s] !== 0xFF || map[s] !== undefined);
+  return h('div', { class: 'cmap' },
+    h('h3', null, title, h('span', { class: 'hint' }, help)),
+    h('div', { class: 'inline' }, h('span', { class: 'hint' }, 'All buttons'), colourControl(def, allowRandom, (v, live) => set('default', v, live), keyPrefix + '-default')),
+    h('div', { class: 'cgrid' }, slots.map(s => {
+      const own = map[s] !== undefined;
+      return h('div', { class: 'cchip' + (own ? ' set' : ''), title: own ? `${s} has its own colour` : `${s} uses the all buttons colour. Click the swatch to give it its own.` },
+        h('b', null, s),
+        own ? colourControl(map[s], allowRandom, (v, live) => set(s, v, live), keyPrefix + '-' + s)
+          : h('button', { class: 'inherit', 'aria-label': `Give ${s} its own colour`, style: `background:${def === 'random' ? 'conic-gradient(#7fdc00,#00dcdc,#7f00dc,#ff0000,#7fdc00)' : def}`, onclick: () => set(s, def, false) }),
+        own ? h('button', { class: 'btn icon ghost small', title: 'Use the all buttons colour', 'aria-label': `Reset ${s}`, onclick: () => clear(s) }, '×') : null);
+    })));
+}
+
+function renderLook(c) {
+  c.idle = c.idle || { type: 'RainbowCircling' };
+  const idle = c.idle;
+  const usesStatic = /^StaticColour/.test(idle.type);
+  const usesPulse = /Pulse$/.test(idle.type) && idle.type !== 'StaticColourPulsing';
+  return h('div', { class: 'colours' },
+    h('div', { class: 'cmap' },
+      h('h3', null, 'Idle animation', h('span', { class: 'hint' }, `Starts after ${state.simConfig.idleTimeoutMs / 1000}s with no buttons held (IDLE_TIMEOUT_SECONDS in kaimana_custom.h)`)),
+      h('div', { class: 'inline' },
+        h('select', { 'data-key': 'idle-type', onchange: e => { idle.type = e.target.value; changed(); } },
+          cg.IDLE_TYPES.map(t => h('option', { value: t, selected: idle.type === t ? 'selected' : null }, t.replace(/([a-z])([A-Z])/g, '$1 $2')))),
+        h('span', { class: 'hint' }, IDLE_HELP[idle.type] || ''))),
+    usesStatic ? colourMapEditor('Idle static colour', 'Base colour for the static idle modes', () => idle.staticColour, m => { idle.staticColour = m; }, '#000000', false, 'is') : null,
+    usesPulse ? colourMapEditor('Idle pulse colour', 'Colour of the travelling pulse', () => idle.pulseColour, m => { idle.pulseColour = m; }, '#ffffff', false, 'ip') : null,
+    colourMapEditor('Not pressed', 'When not idling and the button isn’t held', () => c.notPressedColour, m => { c.notPressedColour = m; }, '#000000', false, 'np'),
+    colourMapEditor('Pressed', 'While the button is held', () => c.pressedColour, m => { c.pressedColour = m; }, 'random', true, 'pr'),
+    h('div', { class: 'cmap' },
+      h('h3', null, 'After release', h('span', { class: 'hint' }, 'Hold the pressed colour, then fade to the not pressed colour. Keep the total under the idle timeout.')),
+      h('div', { class: 'inline' },
+        h('label', { class: 'inline' }, 'Hold', h('input', { type: 'number', min: 0, max: 65535, step: 50, value: c.holdMs || 0, 'data-key': 'hold', oninput: e => { c.holdMs = Math.max(0, parseInt(e.target.value, 10) || 0); changed({ render: false, coalesce: true }); } }), 'ms'),
+        h('label', { class: 'inline' }, 'Fade', h('input', { type: 'number', min: 0, max: 65535, step: 50, value: c.fadeMs || 0, 'data-key': 'fade', oninput: e => { c.fadeMs = Math.max(0, parseInt(e.target.value, 10) || 0); changed({ render: false, coalesce: true }); } }), 'ms'),
+        (c.holdMs || 0) + (c.fadeMs || 0) >= state.simConfig.idleTimeoutMs ? h('span', { class: 'hint', style: 'color:var(--warn)' }, 'Longer than the idle timeout, so the idle animation will cut the fade short.') : null)));
+}
+
+// ----- moves -----
+function renderMoves(c) {
+  c.moves = c.moves || [];
+  const list = h('div', { class: 'moves' });
+  if (!c.moves.length) list.append(h('div', { class: 'empty' }, 'No special moves yet.'));
+  c.moves.forEach((m, i) => list.append(renderMove(c, m, i)));
+  return h('div', null,
+    h('p', { class: 'hint', style: 'margin-top:0' }, 'Moves are checked from the top down and the first match wins, so keep supers and long motions above the moves they contain (eg a double quarter circle above a quarter circle). Drag ≡ to reorder.'),
+    list,
+    h('div', { class: 'inline', style: 'margin-top:10px' },
+      h('button', { class: 'btn', onclick: () => {
+        const m = { name: 'New move', inputs: [{ motion: Object.keys(state.doc.motions)[0] || 'QUARTERCIRCLE_RIGHT', triggers: ['P1'], charge: false }], animations: [cg.defaultAnimation('FlashColour')] };
+        c.moves.push(m); state.expanded.add(m); changed();
+      } }, '+ Add move'),
+      c.moves.length ? h('button', { class: 'btn small ghost', onclick: () => { c.moves.forEach(m => state.expanded.add(m)); render(); } }, 'Expand all') : null,
+      c.moves.length ? h('button', { class: 'btn small ghost', onclick: () => { state.expanded.clear(); render(); } }, 'Collapse all') : null));
+}
+
+let dragIndex = null;
+function renderMove(c, m, i) {
+  const open = state.expanded.has(m);
+  const colours = [...new Set(m.animations.map(a => a.colour).filter(Boolean))].slice(0, 5);
+  const move = (from, to) => { if (to < 0 || to >= c.moves.length) return; c.moves.splice(to, 0, c.moves.splice(from, 1)[0]); changed(); };
+  const card = h('div', { class: 'move',
+    ondragover: e => { if (dragIndex !== null) { e.preventDefault(); card.classList.add('drag-over'); } },
+    ondragleave: () => card.classList.remove('drag-over'),
+    ondrop: e => { e.preventDefault(); card.classList.remove('drag-over'); if (dragIndex !== null && dragIndex !== i) move(dragIndex, i); dragIndex = null; },
+  },
+  h('div', { class: 'move-head' },
+    h('span', { class: 'grip', draggable: 'true', title: 'Drag to change priority', ondragstart: e => { dragIndex = i; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); }, ondragend: () => { dragIndex = null; } }, '≡'),
+    h('span', { class: 'prio' }, i + 1),
+    h('button', { class: 'name', 'aria-expanded': open ? 'true' : 'false', onclick: () => { open ? state.expanded.delete(m) : state.expanded.add(m); render(); } }, (open ? '▾ ' : '▸ ') + (m.name || 'Unnamed move')),
+    h('span', { class: 'sum' }, moveSummary(m)),
+    h('span', { class: 'swatches' }, colours.map(col => h('i', { style: `background:${col === 'random' ? 'conic-gradient(#7fdc00,#00dcdc,#7f00dc,#ff0000,#7fdc00)' : col}` }))),
+    h('button', { class: 'btn icon small', title: 'Play in the preview', 'aria-label': `Play ${m.name}`, onclick: () => sim.play(m.animations) }, '▶'),
+    h('button', { class: 'btn icon ghost small', title: 'Move up (higher priority)', 'aria-label': 'Move up', disabled: i === 0, onclick: () => move(i, i - 1) }, '↑'),
+    h('button', { class: 'btn icon ghost small', title: 'Move down', 'aria-label': 'Move down', disabled: i === c.moves.length - 1, onclick: () => move(i, i + 1) }, '↓')),
+  open ? renderMoveBody(c, m, i) : null);
+  return card;
+}
+
+function renderMoveBody(c, m, i) {
+  const motionNames = Object.keys(state.doc.motions);
+  const inputs = h('div', { class: 'rows' }, m.inputs.map((t, ti) => {
+    const seq = state.doc.motions[t.motion] || [];
+    const extraTriggers = t.triggers.filter(b => !cg.ATTACKS.includes(b));
+    return h('div', { class: 'row' },
+      h('select', { 'aria-label': 'Motion', onchange: e => { t.motion = e.target.value; changed(); } },
+        motionNames.map(n => h('option', { value: n, selected: n === t.motion ? 'selected' : null }, n))),
+      h('span', { class: 'seq', title: seq.join(', ') }, seqText(seq)),
+      h('span', { class: 'hint' }, '+'),
+      h('span', { class: 'chips', role: 'group', 'aria-label': 'Buttons' }, cg.ATTACKS.map(b => {
+        const on = t.triggers.includes(b);
+        return h('button', { class: on ? 'on' : '', 'aria-pressed': on ? 'true' : 'false', disabled: !on && t.triggers.length >= cg.LIMITS.maxTriggers,
+          onclick: () => { t.triggers = on ? t.triggers.filter(x => x !== b) : t.triggers.concat(b); changed(); } }, b);
+      }), extraTriggers.map(b => h('button', { class: 'on', title: 'Direction used as a finishing input', onclick: () => { t.triggers = t.triggers.filter(x => x !== b); changed(); } }, b))),
+      h('label', { class: 'inline hint', title: 'The first direction must be held for 750ms first (CHARGE_COMBO_INPUT_TIME_WINDOW)' },
+        h('input', { type: 'checkbox', checked: !!t.charge, onchange: e => { t.charge = e.target.checked; changed(); } }), 'charge'),
+      h('span', { class: 'tools' },
+      h('button', { class: 'btn small ghost', title: 'Replace with one row for each of P1, P2 and P3', onclick: () => { m.inputs.splice(ti, 1, ...['P1', 'P2', 'P3'].map(b => ({ motion: t.motion, triggers: [b], charge: t.charge }))); changed(); } }, '×3 P'),
+      h('button', { class: 'btn small ghost', title: 'Replace with one row for each of K1, K2 and K3', onclick: () => { m.inputs.splice(ti, 1, ...['K1', 'K2', 'K3'].map(b => ({ motion: t.motion, triggers: [b], charge: t.charge }))); changed(); } }, '×3 K'),
+      h('button', { class: 'btn icon ghost small danger', 'aria-label': 'Remove input', disabled: m.inputs.length === 1, onclick: () => { m.inputs.splice(ti, 1); changed(); } }, '✕')));
+  }));
+
+  const steps = h('div', { class: 'rows' }, m.animations.map((a, ai) => {
+    const def = cg.ANIMATIONS[a.type];
+    const fields = def.fields.map(f => {
+      const key = `step-${i}-${ai}-${f.key}`;
+      if (f.kind === 'colour') return h('label', null, f.label, colourControl(a[f.key] || f.default, true, (v, live) => { a[f.key] = v; changed({ render: !live, coalesce: live }); }, key));
+      if (f.kind === 'int') return h('label', null, f.label, h('input', { type: 'number', min: f.min, max: f.max, value: a[f.key], 'data-key': key, oninput: e => { a[f.key] = parseInt(e.target.value, 10); if (Number.isNaN(a[f.key])) a[f.key] = f.min; changed({ render: false, coalesce: true }); } }));
+      if (f.kind === 'bool') return h('label', null, h('input', { type: 'checkbox', checked: !!a[f.key], onchange: e => { a[f.key] = e.target.checked; changed(); } }), f.label);
+      if (f.kind === 'select') return h('label', null, f.label, h('select', { onchange: e => { a[f.key] = e.target.value; changed(); } }, f.options.map(o => h('option', { value: o, selected: a[f.key] === o ? 'selected' : null }, o.replace(/([a-z])([A-Z])/g, '$1 $2')))));
+      return null;
+    });
+    return h('div', { class: 'row step', title: def.help },
+      h('select', { 'aria-label': 'Animation type', onchange: e => {
+        const n = cg.defaultAnimation(e.target.value);
+        if (a.colour && n.colour !== undefined) n.colour = a.colour;
+        if (a.repeat) n.repeat = a.repeat;
+        m.animations[ai] = n; changed();
+      } }, Object.keys(cg.ANIMATIONS).map(k => h('option', { value: k, selected: k === a.type ? 'selected' : null }, cg.ANIMATIONS[k].label))),
+      h('span', { class: 'step-fields' }, fields,
+        h('label', { title: 'Play this step more than once' }, '×', h('input', { type: 'number', min: 1, max: cg.LIMITS.maxRepeat, value: a.repeat || 1, style: 'width:56px', 'data-key': `step-${i}-${ai}-repeat`,
+          oninput: e => { const r = parseInt(e.target.value, 10) || 1; if (r <= 1) delete a.repeat; else a.repeat = r; changed({ render: false, coalesce: true }); } }))),
+      h('span', { class: 'tools' },
+      h('button', { class: 'btn icon ghost small', 'aria-label': 'Step earlier', disabled: ai === 0, onclick: () => { m.animations.splice(ai - 1, 0, m.animations.splice(ai, 1)[0]); changed(); } }, '↑'),
+      h('button', { class: 'btn icon ghost small', 'aria-label': 'Step later', disabled: ai === m.animations.length - 1, onclick: () => { m.animations.splice(ai + 1, 0, m.animations.splice(ai, 1)[0]); changed(); } }, '↓'),
+      h('button', { class: 'btn icon ghost small danger', 'aria-label': 'Remove step', disabled: m.animations.length === 1, onclick: () => { m.animations.splice(ai, 1); changed(); } }, '✕')));
+  }));
+
+  return h('div', { class: 'move-body' },
+    h('label', { class: 'field' }, h('span', null, 'Move name'),
+      h('input', { type: 'text', value: m.name || '', 'data-key': `move-name-${i}`, oninput: e => { m.name = e.target.value; changed({ render: false, coalesce: true }); }, onchange: () => render() })),
+    h('h4', null, 'Inputs (any one of these triggers the move)'),
+    inputs,
+    h('div', { class: 'inline' },
+      h('button', { class: 'btn small', onclick: () => { const last = m.inputs[m.inputs.length - 1]; m.inputs.push(last ? JSON.parse(JSON.stringify(last)) : { motion: motionNames[0], triggers: ['P1'], charge: false }); changed(); } }, '+ Add input'),
+      h('span', { class: 'hint' }, 'Motion + the button(s) pressed together at the end. Need a new motion? Use the Motion library tab.')),
+    h('h4', null, 'Animation (steps play in order)'),
+    steps,
+    h('div', { class: 'inline' },
+      h('select', { 'aria-label': 'Add animation step', onchange: e => { if (!e.target.value) return; m.animations.push(cg.defaultAnimation(e.target.value)); changed(); } },
+        h('option', { value: '' }, '+ Add step…'), Object.keys(cg.ANIMATIONS).map(k => h('option', { value: k }, cg.ANIMATIONS[k].label))),
+      h('button', { class: 'btn small', onclick: () => sim.play(m.animations) }, '▶ Play')),
+    h('div', { class: 'inline', style: 'border-top:1px solid var(--line);padding-top:10px' },
+      h('button', { class: 'btn small', title: 'Add a copy for the other side, with left and right swapped', onclick: () => {
+        const copy = cg.mirrorMove(state.doc, m); c.moves.splice(i + 1, 0, copy); state.expanded.add(copy); changed();
+      } }, '⇋ Mirror to other side'),
+      h('button', { class: 'btn small', onclick: () => { const copy = JSON.parse(JSON.stringify(m)); copy.name += ' copy'; c.moves.splice(i + 1, 0, copy); state.expanded.add(copy); changed(); } }, 'Duplicate'),
+      h('span', { class: 'spacer' }),
+      h('button', { class: 'btn small danger', onclick: () => { c.moves.splice(i, 1); changed(); } }, 'Delete move')));
+}
+
+// ----- motion library -----
+function renderMotions() {
+  const motions = state.doc.motions;
+  const list = h('div', { class: 'motions' });
+  Object.keys(motions).forEach(name => {
+    const seq = motions[name];
+    const uses = motionUsage(name);
+    if (state.editingMotion === name) { list.append(renderMotionEditor(name)); return; }
+    list.append(h('div', { class: 'motion' },
+      h('b', { style: 'overflow:hidden;text-overflow:ellipsis' }, name),
+      h('span', { class: 'seq', title: seq.join(', ') }, seqText(seq)),
+      h('span', { class: 'inline' },
+        h('span', { class: 'hint' }, uses ? `used ${uses}×` : 'unused'),
+        h('button', { class: 'btn small', onclick: () => { state.editingMotion = name; render(); } }, 'Edit'),
+        h('button', { class: 'btn small danger', disabled: !!uses, title: uses ? 'In use, remove it from moves first' : 'Delete', onclick: () => { delete motions[name]; changed(); } }, 'Delete'))));
+  });
+  return h('div', null,
+    h('p', { class: 'hint', style: 'margin-top:0' }, 'Motions are the joystick part of a special move and are shared by every character. Directions are for a character facing right; add a mirrored copy for the other side (the ⇋ button on a move does this for you).'),
+    list,
+    h('div', { class: 'inline', style: 'margin-top:10px' }, h('button', { class: 'btn', onclick: () => {
+      let n = 'NEW_MOTION', k = 2; while (motions[n]) n = 'NEW_MOTION_' + k++;
+      motions[n] = ['Down', 'DownRight', 'Right']; state.editingMotion = n; changed();
+    } }, '+ New motion')));
+}
+
+function renderMotionEditor(name) {
+  const motions = state.doc.motions;
+  const seq = motions[name];
+  const nameInput = h('input', { type: 'text', value: name, 'data-key': 'motion-name', spellcheck: 'false', style: 'width:260px' });
+  const rename = () => {
+    const v = nameInput.value.trim();
+    if (v === name) return true;
+    if (!/^[\w -]{1,40}$/.test(v)) { toast('Motion names use letters, numbers, spaces, - and _', 'bad'); return false; }
+    if (motions[v]) { toast('There is already a motion with that name', 'bad'); return false; }
+    const rebuilt = {};
+    for (const k of Object.keys(motions)) rebuilt[k === name ? v : k] = motions[k];
+    state.doc.motions = rebuilt;
+    state.doc.characters.forEach(c => (c.moves || []).forEach(m => m.inputs.forEach(t => { if (t.motion === name) t.motion = v; })));
+    state.editingMotion = v;
+    return true;
+  };
+  const push = i => { if (seq.length < cg.LIMITS.switchHistoryMax - 1) { seq.push(i); changed(); } };
+  const padOrder = ['UpLeft', 'Up', 'UpRight', 'Left', null, 'Right', 'DownLeft', 'Down', 'DownRight'];
+  return h('div', { class: 'motion editing' },
+    h('div', { class: 'inline' }, h('span', { class: 'hint' }, 'Name'), nameInput,
+      h('button', { class: 'btn small', onclick: () => { if (rename()) changed(); } }, 'Rename'),
+      h('span', { class: 'hint' }, motionUsage(name) ? `used by ${motionUsage(name)} move inputs` : '')),
+    h('div', { class: 'seq', style: 'font-size:22px;min-height:32px' }, seqText(seq)),
+    h('div', { class: 'inline', style: 'align-items:flex-start;gap:16px' },
+      h('div', { class: 'pad', role: 'group', 'aria-label': 'Add direction' }, padOrder.map(d => d ? h('button', { title: d, 'aria-label': d, onclick: () => push(d) }, GLYPH[d]) : h('span'))),
+      h('div', { class: 'padbtns', role: 'group', 'aria-label': 'Add button' }, cg.ATTACKS.map(b => h('button', { onclick: () => push(b) }, b))),
+      h('div', { class: 'inline', style: 'flex-direction:column;align-items:stretch' },
+        h('button', { class: 'btn small', disabled: !seq.length, onclick: () => { seq.pop(); changed(); } }, '⌫ Remove last'),
+        h('button', { class: 'btn small', disabled: !seq.length, onclick: () => { seq.length = 0; changed(); } }, 'Clear'),
+        h('button', { class: 'btn small primary', onclick: () => { if (rename()) { state.editingMotion = null; changed(); } } }, 'Done'))),
+    h('p', { class: 'hint', style: 'margin:0' }, 'Leave the motion empty for moves that are just buttons pressed together. Motions of 7 or more inputs allow one missed input, which makes 360s easier.'));
+}
+
+// ---------- preview ----------
+const sim = new SIM.KaimanaSim(SIM.DEFAULT_CONFIG);
+const canvas = h('canvas', { width: 540, height: 250, 'aria-label': 'Stick preview. Click and hold buttons, or use the keyboard.' });
+const renderer = new SIM.StickRenderer(canvas, sim);
+const detected = h('div', { class: 'detected', 'aria-live': 'polite' });
+const previewColumn = h('div', { class: 'preview-col' },
+  h('section', { class: 'card preview' },
+    h('h2', null, 'Preview', h('span', { class: 'spacer' }), h('span', { id: 'previewName', style: 'text-transform:none;letter-spacing:0;color:var(--text)' })),
+    canvas,
+    detected,
+    h('div', { class: 'keys' },
+      h('span', null, h('kbd', null, 'W A S D'), ' / ', h('kbd', null, '← ↑ → ↓')), h('span', null, 'Joystick'),
+      h('span', null, h('kbd', null, 'U I O P')), h('span', null, 'P1 P2 P3 P4'),
+      h('span', null, h('kbd', null, 'J K L ;')), h('span', null, 'K1 K2 K3 K4'),
+      h('span', null, 'Mouse'), h('span', null, 'Click and hold a button on the stick')),
+    h('p', { class: 'hint', style: 'margin:8px 0 0' }, 'Try your special moves here with the keyboard. Timings match the stick (charge needs 750ms). Click away from text boxes first.'),
+    h('div', { class: 'inline', style: 'margin-top:8px' },
+      h('button', { class: 'btn small', onclick: () => sim.cancelAnimation() }, 'Stop animation'),
+      h('label', { class: 'inline hint' }, h('input', { type: 'checkbox', checked: true, onchange: e => { renderer.labels = e.target.checked; } }), 'Button labels'))));
+
+let lastLeds = null;
+sim.onRender = leds => { lastLeds = leds; };
+(function draw() { renderer.draw(lastLeds || sim.display); requestAnimationFrame(draw); })();
+let detectedTimer = null;
+sim.onMove = m => {
+  detected.textContent = '✓ ' + (m.name || 'Special move');
+  clearTimeout(detectedTimer);
+  detectedTimer = setTimeout(() => { detected.textContent = ''; }, 2500);
+};
+function syncPreview() {
+  const c = currentChar();
+  sim.setCharacter(c || null, state.doc ? state.doc.motions : {});
+  const label = document.getElementById('previewName');
+  if (label) label.textContent = c ? c.name : '';
+}
+sim.run();
+
+const typing = t => t && (t.tagName === 'INPUT' && !['checkbox', 'color', 'button'].includes(t.type) || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); return; }
+  if ((e.ctrlKey || e.metaKey) && !typing(e.target) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if ((e.ctrlKey || e.metaKey) && !typing(e.target) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target) || !state.doc) return;
+  const name = KEYMAP[e.key] || KEYMAP[e.key.toLowerCase()];
+  if (name) { e.preventDefault(); sim.press(name); }
+});
+document.addEventListener('keyup', e => {
+  const name = KEYMAP[e.key] || KEYMAP[e.key.toLowerCase()];
+  if (name) sim.release(name);
+});
+window.addEventListener('blur', () => sim.releaseAll());
+const pointerButtons = new Map();
+canvas.addEventListener('pointerdown', e => {
+  const r = canvas.getBoundingClientRect();
+  const name = renderer.hitTest((e.clientX - r.left) * 540 / r.width, (e.clientY - r.top) * 250 / r.height);
+  if (!name) return;
+  canvas.setPointerCapture(e.pointerId);
+  pointerButtons.set(e.pointerId, name);
+  sim.press(name);
+});
+const pointerUp = e => { const n = pointerButtons.get(e.pointerId); if (n) { sim.release(n); pointerButtons.delete(e.pointerId); } };
+canvas.addEventListener('pointerup', pointerUp);
+canvas.addEventListener('pointercancel', pointerUp);
+
+// ---------- wiring ----------
+$('saveBtn').addEventListener('click', save);
+$('undoBtn').addEventListener('click', undo);
+$('redoBtn').addEventListener('click', redo);
+$('errBtn').addEventListener('click', () => { state.showErrors = !state.showErrors; renderHeader(); });
+window.addEventListener('beforeunload', e => { if (state.dirty) { e.preventDefault(); e.returnValue = ''; } });
+$('namedColours').replaceChildren(...Object.values(cg.NAMED_COLOURS).map(v => h('option', { value: v })));
+
+render();
+if (hasFS) {
+  recallDir().then(dir => {
+    state.rememberedDir = dir;
+    if (dir && !state.doc) render();
+  });
+}
+</script>
+</body>
+</html>

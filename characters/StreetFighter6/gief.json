@@ -1,0 +1,847 @@
+{
+  "format": "kaimana-character",
+  "version": 1,
+  "id": "gief",
+  "name": "Zangief",
+  "notes": "Example for YELLOW idle mode. Out of idle will be RED if not pressed and GREEN if pressed",
+  "idle": {
+    "type": "RainbowCircling",
+    "staticColour": {
+      "default": "#000000"
+    },
+    "pulseColour": {
+      "default": "#ffffff"
+    }
+  },
+  "notPressedColour": {
+    "default": "#000000"
+  },
+  "pressedColour": {
+    "default": "random"
+  },
+  "holdMs": 0,
+  "fadeMs": 0,
+  "moves": [
+    {
+      "name": "Buster (both ways)",
+      "inputs": [
+        {
+          "motion": "630_LEFT_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_UP_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_RIGHT_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_DOWN_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_LEFT_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_UP_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_RIGHT_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_DOWN_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_LEFT_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_UP_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_RIGHT_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_DOWN_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_LEFT_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_UP_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_RIGHT_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_DOWN_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_LEFT_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_UP_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_RIGHT_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_DOWN_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_LEFT_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_UP_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_RIGHT_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "630_DOWN_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "CircleRGB",
+          "loops": 1
+        },
+        {
+          "type": "FlashAllSpeedIncreasing",
+          "colour": "#ff0000"
+        }
+      ]
+    },
+    {
+      "name": "Cyclone Lariat (both sides)",
+      "inputs": [
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "CircleOneColour",
+          "loops": 4,
+          "colour": "#ff0000"
+        }
+      ]
+    },
+    {
+      "name": "AerialSlam (both sides)",
+      "inputs": [
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_RIGHT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "DOUBLE_QUARTERCIRCLE_LEFT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "Wave",
+          "direction": "DownToUp",
+          "speed": "Medium",
+          "loops": 1,
+          "colour": "#ff9600"
+        },
+        {
+          "type": "Wave",
+          "direction": "UpToDown",
+          "speed": "Medium",
+          "loops": 1,
+          "colour": "#ff9600"
+        }
+      ]
+    },
+    {
+      "name": "Lariat",
+      "inputs": [
+        {
+          "motion": "BUTTONS_ONLY",
+          "triggers": [
+            "P3",
+            "P2",
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "BUTTONS_ONLY",
+          "triggers": [
+            "P1",
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "BUTTONS_ONLY",
+          "triggers": [
+            "P1",
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "BUTTONS_ONLY",
+          "triggers": [
+            "P2",
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "KnightRider",
+          "loops": 2,
+          "topRow": true,
+          "colour": "#ff0000"
+        }
+      ]
+    },
+    {
+      "name": "bear grab (both sides)",
+      "inputs": [
+        {
+          "motion": "HALFCIRCLE_RIGHT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "HALFCIRCLE_RIGHT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "HALFCIRCLE_RIGHT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "HALFCIRCLE_LEFT",
+          "triggers": [
+            "K1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "HALFCIRCLE_LEFT",
+          "triggers": [
+            "K2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "HALFCIRCLE_LEFT",
+          "triggers": [
+            "K3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "CircleOneColour",
+          "loops": 2,
+          "colour": "#ff9600"
+        }
+      ]
+    },
+    {
+      "name": "piledriver",
+      "inputs": [
+        {
+          "motion": "270_LEFT_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_UP_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_RIGHT_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_DOWN_CLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_LEFT_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_UP_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_RIGHT_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_DOWN_ANTICLOCKWISE",
+          "triggers": [
+            "P1"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_LEFT_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_UP_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_RIGHT_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_DOWN_CLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_LEFT_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_UP_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_RIGHT_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_DOWN_ANTICLOCKWISE",
+          "triggers": [
+            "P2"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_LEFT_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_UP_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_RIGHT_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_DOWN_CLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_LEFT_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_UP_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_RIGHT_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        },
+        {
+          "motion": "270_DOWN_ANTICLOCKWISE",
+          "triggers": [
+            "P3"
+          ],
+          "charge": false
+        }
+      ],
+      "animations": [
+        {
+          "type": "CircleOneColour",
+          "loops": 2,
+          "colour": "#ff0000"
+        }
+      ]
+    }
+  ],
+  "motions": {
+    "630_LEFT_CLOCKWISE": [
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down"
+    ],
+    "630_UP_CLOCKWISE": [
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "630_RIGHT_CLOCKWISE": [
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up"
+    ],
+    "630_DOWN_CLOCKWISE": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right"
+    ],
+    "630_LEFT_ANTICLOCKWISE": [
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up"
+    ],
+    "630_UP_ANTICLOCKWISE": [
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "630_RIGHT_ANTICLOCKWISE": [
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down"
+    ],
+    "630_DOWN_ANTICLOCKWISE": [
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left"
+    ],
+    "DOUBLE_QUARTERCIRCLE_RIGHT": [
+      "Down",
+      "DownRight",
+      "Right",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "DOUBLE_QUARTERCIRCLE_LEFT": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "BUTTONS_ONLY": [],
+    "HALFCIRCLE_RIGHT": [
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "HALFCIRCLE_LEFT": [
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "270_LEFT_CLOCKWISE": [
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down"
+    ],
+    "270_UP_CLOCKWISE": [
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "270_RIGHT_CLOCKWISE": [
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up"
+    ],
+    "270_DOWN_CLOCKWISE": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right"
+    ],
+    "270_LEFT_ANTICLOCKWISE": [
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up"
+    ],
+    "270_UP_ANTICLOCKWISE": [
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "270_RIGHT_ANTICLOCKWISE": [
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down"
+    ],
+    "270_DOWN_ANTICLOCKWISE": [
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left"
+    ]
+  }
+}

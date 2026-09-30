@@ -1,0 +1,14 @@
+{
+  "format": "kaimana-profiles",
+  "version": 1,
+  "slots": [
+    "StreetFighter6/ryu",
+    "StreetFighter6/honda",
+    "StreetFighter6/blanka",
+    "StreetFighter6/guile",
+    "StreetFighter6/ken",
+    "StreetFighter6/chun",
+    "StreetFighter6/gief",
+    "StreetFighter6/dhalsim"
+  ]
+}
