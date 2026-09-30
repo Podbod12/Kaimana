@@ -1,0 +1,32 @@
+{
+  "format": "kaimana-character",
+  "version": 1,
+  "id": "sf2_arcade_control_panel",
+  "name": "SF2 Arcade Control Panel",
+  "notes": "Example profile that is not a real character. Buttons match the original SF2 cabinet colours and turn green when pressed. No special moves.",
+  "idle": {
+    "type": "Disabled",
+    "staticColour": {
+      "default": "#000000"
+    },
+    "pulseColour": {
+      "default": "#ffffff"
+    }
+  },
+  "notPressedColour": {
+    "default": "#ffff00",
+    "P1": "#ff0000",
+    "K1": "#ff0000",
+    "P2": "#ffffff",
+    "K2": "#ffffff",
+    "P3": "#0000ff",
+    "K3": "#0000ff"
+  },
+  "pressedColour": {
+    "default": "#00ff00"
+  },
+  "holdMs": 0,
+  "fadeMs": 0,
+  "moves": [],
+  "motions": {}
+}

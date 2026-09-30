@@ -189,8 +189,8 @@ const EInputTypes COMBO_630_RIGHT_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =
 const EInputTypes COMBO_630_DOWN_ANTICLOCKWISE[SIXTHIRTY_INPUT_COUNT] PROGMEM =  { EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left, EIT_Input_DownLeft, EIT_Input_Down, EIT_Input_DownRight, EIT_Input_Right, EIT_Input_UpRight, EIT_Input_Up, EIT_Input_UpLeft, EIT_Input_Left };
 
 #define HELL_MURDER_INPUT_COUNT 3
-const EInputTypes HELL_MURDER_INPUT_LEFT[HELL_MURDER_INPUT_COUNT] PROGMEM = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Right };
-const EInputTypes HELL_MURDER_INPUT_RIGHT[HELL_MURDER_INPUT_COUNT] PROGMEM = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Left };
+const EInputTypes HELL_MURDER_INPUT_LEFT[HELL_MURDER_INPUT_COUNT] PROGMEM = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Left };
+const EInputTypes HELL_MURDER_INPUT_RIGHT[HELL_MURDER_INPUT_COUNT] PROGMEM = { EIT_Input_P1, EIT_Input_P1, EIT_Input_Right };
 
 //Most trigger arrays are generated locally in the character but these are worth having global for ease of use
 #define TRIPLEATTACK_TRIGGER_COUNT 3

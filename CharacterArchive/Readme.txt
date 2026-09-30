@@ -1,0 +1,1 @@
+The characters in this folder were the old hand written versions. With the new GUI, creating characters is now done there and saved into data files. These old versions are kept here for reference if you want to create your own more complicated characters that the GUI cant build (for instance, if you wrote a new animation effect).

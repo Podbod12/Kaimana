@@ -1,0 +1,309 @@
+{
+  "format": "kaimana-motions",
+  "version": 1,
+  "motions": {
+    "QUARTERCIRCLE_RIGHT": [
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "QUARTERCIRCLE_LEFT": [
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "HALFCIRCLE_RIGHT": [
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "HALFCIRCLE_LEFT": [
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "DP_RIGHT": [
+      "Right",
+      "Down",
+      "DownRight"
+    ],
+    "DP_LEFT": [
+      "Left",
+      "Down",
+      "DownLeft"
+    ],
+    "DOUBLE_QUARTERCIRCLE_RIGHT": [
+      "Down",
+      "DownRight",
+      "Right",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "DOUBLE_QUARTERCIRCLE_LEFT": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "DOUBLE_DOWN": [
+      "Down",
+      "Down"
+    ],
+    "CHARGE_RIGHT_LEFT": [
+      "Right",
+      "Left"
+    ],
+    "CHARGE_LEFT_RIGHT": [
+      "Left",
+      "Right"
+    ],
+    "CHARGE_DOWN_UP": [
+      "Down",
+      "Up"
+    ],
+    "CHARGE_SUPER_RIGHT_LEFT": [
+      "Right",
+      "Left",
+      "Right",
+      "Left"
+    ],
+    "CHARGE_SUPER_LEFT_RIGHT": [
+      "Left",
+      "Right",
+      "Left",
+      "Right"
+    ],
+    "270_LEFT_CLOCKWISE": [
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down"
+    ],
+    "270_UP_CLOCKWISE": [
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "270_RIGHT_CLOCKWISE": [
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up"
+    ],
+    "270_DOWN_CLOCKWISE": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right"
+    ],
+    "270_LEFT_ANTICLOCKWISE": [
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up"
+    ],
+    "270_UP_ANTICLOCKWISE": [
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "270_RIGHT_ANTICLOCKWISE": [
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down"
+    ],
+    "270_DOWN_ANTICLOCKWISE": [
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left"
+    ],
+    "630_LEFT_CLOCKWISE": [
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down"
+    ],
+    "630_UP_CLOCKWISE": [
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left"
+    ],
+    "630_RIGHT_CLOCKWISE": [
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up"
+    ],
+    "630_DOWN_CLOCKWISE": [
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right",
+      "DownRight",
+      "Down",
+      "DownLeft",
+      "Left",
+      "UpLeft",
+      "Up",
+      "UpRight",
+      "Right"
+    ],
+    "630_LEFT_ANTICLOCKWISE": [
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up"
+    ],
+    "630_UP_ANTICLOCKWISE": [
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right"
+    ],
+    "630_RIGHT_ANTICLOCKWISE": [
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down"
+    ],
+    "630_DOWN_ANTICLOCKWISE": [
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left",
+      "DownLeft",
+      "Down",
+      "DownRight",
+      "Right",
+      "UpRight",
+      "Up",
+      "UpLeft",
+      "Left"
+    ],
+    "HELL_MURDER_INPUT_LEFT": [
+      "P1",
+      "P1",
+      "Left"
+    ],
+    "HELL_MURDER_INPUT_RIGHT": [
+      "P1",
+      "P1",
+      "Right"
+    ],
+    "LEFT": [
+      "Left"
+    ],
+    "RIGHT": [
+      "Right"
+    ],
+    "BUTTONS_ONLY": []
+  }
+}
