@@ -72,7 +72,11 @@
   .charlist .tag { margin-left: auto; font-size: 11px; color: var(--muted); }
   .notices { margin: 16px 16px 0; padding: 10px 14px; border: 1px solid var(--warn); border-radius: var(--radius); background: var(--panel); }
   .notices ul { margin: 6px 0; padding-left: 20px; }
-  .folderhead { font-size: 12px; color: var(--muted); margin: 10px 0 2px; font-weight: 600; }
+  .folderhead { font-size: 12px; color: var(--muted); margin: 10px 0 2px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  dialog.newchar { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--text); padding: 16px; width: min(420px, calc(100vw - 32px)); }
+  dialog.newchar::backdrop { background: rgba(0,0,0,.45); }
+  dialog.newchar form { display: flex; flex-direction: column; gap: 12px; }
+  dialog.newchar h3 { margin: 0; font-size: 15px; }
   .folderhead:first-of-type { margin-top: 0; }
 
   .charhead { display: grid; grid-template-columns: 1fr 180px; gap: 8px 12px; }
@@ -93,7 +97,10 @@
   .cmap h3 .hint { font-weight: 400; }
   .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; margin-top: 8px; }
   .cchip { display: flex; align-items: center; gap: 5px; border: 1px dashed var(--line); border-radius: 7px; padding: 3px 5px; font-size: 12px; min-height: 32px; }
+  .cgrid.wide { grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); }
+  .cchip { min-width: 0; }
   .cchip.set { border-style: solid; border-color: var(--muted); }
+  .cchip .reset { margin-left: auto; padding: 1px 6px; font-weight: 600; }
   .cchip b { min-width: 34px; }
   .cchip .inherit { width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--line); padding: 0; }
   .ccontrol { display: inline-flex; align-items: center; gap: 4px; }
@@ -135,9 +142,12 @@
   .padbtns { display: grid; grid-template-columns: repeat(4, 40px); gap: 4px; }
   .padbtns button { font-size: 12px; font-weight: 600; }
 
-  .preview-col { position: sticky; top: 72px; }
+  /* only stick the preview while it has its own column, otherwise it would cover the editor when scrolling */
+  @media (min-width: 1401px) { .preview-col { position: sticky; top: 72px; } }
   .preview canvas { width: 100%; aspect-ratio: 540 / 250; display: block; border-radius: 12px; touch-action: none; cursor: pointer; }
   .detected { min-height: 26px; margin-top: 8px; font-weight: 600; color: var(--accent-2); }
+  .kbstatus { font-size: 12px; color: var(--ok); margin-bottom: 4px; }
+  .kbstatus.busy { color: var(--warn); }
   .keys { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 12px; color: var(--muted); margin-top: 6px; }
   kbd { background: var(--chip); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font: 11px ui-monospace, monospace; color: var(--text); }
 
@@ -162,6 +172,7 @@
   <div class="folder" id="folder"></div>
   <div class="spacer"></div>
   <div class="meter hidden" id="meter" title=""><div id="meterText"></div><div class="bar"><i id="meterBar"></i></div></div>
+  <button class="btn small hidden" id="reloadBtn" title="Read the sketch folder again, eg after adding character files in Explorer or Finder">Reload</button>
   <button class="btn small hidden" id="undoBtn" title="Undo (Ctrl+Z)">Undo</button>
   <button class="btn small hidden" id="redoBtn" title="Redo (Ctrl+Y)">Redo</button>
   <button class="btn small errbtn hidden" id="errBtn"></button>
@@ -195,7 +206,7 @@ const IDLE_HELP = {
 };
 const SLOT_BUTTONS = ['P1', 'P2', 'P3', 'P4', 'K1', 'K2', 'K3', 'K4'];
 const KEYMAP = { ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right', w: 'Up', s: 'Down', a: 'Left', d: 'Right',
-  u: 'P1', i: 'P2', o: 'P3', p: 'P4', j: 'K1', k: 'K2', l: 'K3', ';': 'K4' };
+  u: 'P1', i: 'P2', o: 'P3', p: 'P4', j: 'K1', k: 'K2', l: 'K3', ';': 'K4', v: 'Select', b: 'Start', n: 'Home' };
 
 const state = {
   doc: null, dir: null, natives: null, simConfig: SIM.DEFAULT_CONFIG,
@@ -325,11 +336,14 @@ async function readSketchFromHandle(root) {
     const t = await readText(root, name);
     if (t !== null) files.set(name, t);
   }
+  files.folders = []; // every folder under characters/, even empty ones, so new game folders show up straight away
   const walk = async (handle, rel) => {
     for await (const entry of handle.values()) {
       const p = rel + '/' + entry.name;
-      if (entry.kind === 'directory') await walk(entry, p);
-      else if (wantedFile(p)) files.set(p, await (await entry.getFile()).text());
+      if (entry.kind === 'directory') {
+        if (p.startsWith(cg.PROJECT_DIR + '/')) files.folders.push(p.slice(cg.PROJECT_DIR.length + 1));
+        await walk(entry, p);
+      } else if (wantedFile(p)) files.set(p, await (await entry.getFile()).text());
     }
   };
   for (const top of ['src', cg.PROJECT_DIR]) {
@@ -388,6 +402,21 @@ async function openFolder(dir) {
 }
 
 function openReadOnlyFolder() { $('folderInput').click(); }
+
+// Reads the sketch folder again so files added outside the editor (eg a character someone sent you) show up
+async function reloadFromDisk() {
+  if (state.dirty && !confirm('You have unsaved changes. Reload from disk and lose them?')) return;
+  if (!state.dir) { openReadOnlyFolder(); return; }
+  try {
+    if ((await state.dir.requestPermission({ mode: 'readwrite' })) !== 'granted') throw new Error('permission denied');
+  } catch (e) { toast('Could not read the folder: ' + e.message, 'bad'); return; }
+  const keep = { selected: state.selected, tab: state.tab };
+  const before = state.doc ? state.doc.characters.length : 0;
+  loadSketch(await readSketchFromHandle(state.dir), state.dir.name);
+  if (state.doc.characters.some(c => keyOf(c) === keep.selected)) { state.selected = keep.selected; state.tab = keep.tab; render(); syncPreview(); }
+  const diff = state.doc.characters.length - before;
+  toast(`Reloaded from disk${diff > 0 ? `, ${diff} new character${diff === 1 ? '' : 's'}` : ''}.`, 'ok');
+}
 $('folderInput').addEventListener('change', async e => {
   const picked = await readSketchFromFileList(e.target.files);
   e.target.value = '';
@@ -412,6 +441,7 @@ function loadSketch(files, sourceName) {
   const headers = [...files].filter(([p]) => p === 'Characters.h' || p.startsWith('src/')).map(([path, text]) => ({ path, text }));
   state.sourceName = sourceName;
   state.notices = project.warnings;
+  state.extraFolders = new Set(files.folders || []);
   load(project.doc, headers, files.get('kaimana_custom.h') || null);
   if (project.warnings.length) { state.dirty = true; render(); }
 }
@@ -477,7 +507,12 @@ async function save() {
   const files = cg.splitProject(state.doc);
   files['GeneratedCharacters.cpp'] = result.code;
   const loaded = state.loaded || new Map();
-  const changed = Object.keys(files).filter(p => loaded.get(p) !== files[p]);
+  // Git on Windows usually checks files out with CRLF line endings, so ignore line endings when looking for changes and
+  // write files back in the same style as the ones already there (otherwise every file looks changed after a git pull)
+  const lf = t => t.replace(/\r\n/g, '\n');
+  const eol = [...loaded.values()].some(t => t.includes('\r\n')) ? '\r\n' : '\n';
+  for (const p in files) files[p] = eol === '\n' ? files[p] : files[p].replace(/\n/g, eol);
+  const changed = Object.keys(files).filter(p => !loaded.has(p) || lf(loaded.get(p)) !== lf(files[p]));
   const removed = [...loaded.keys()].filter(p => !(p in files));
   if (!changed.length && !removed.length) { state.dirty = false; renderHeader(); toast('Nothing has changed since the last save', 'ok'); return; }
   if (state.dir) {
@@ -503,7 +538,7 @@ async function save() {
 function renderHeader() {
   const doc = state.doc;
   const on = !!doc;
-  ['meter', 'undoBtn', 'redoBtn', 'saveBtn'].forEach(id => $(id).classList.toggle('hidden', !on));
+  ['meter', 'reloadBtn', 'undoBtn', 'redoBtn', 'saveBtn'].forEach(id => $(id).classList.toggle('hidden', !on));
   $('folder').textContent = on ? (state.dir ? '📁 ' : '📄 ') + state.sourceName + (state.dirty ? '  •  unsaved changes' : '') : '';
   if (!on) { $('errBtn').classList.add('hidden'); $('errors').classList.add('hidden'); return; }
   $('undoBtn').disabled = !state.undo.length && JSON.stringify(doc) === state.lastSnapshot;
@@ -599,9 +634,12 @@ function renderCharacterList() {
   const doc = state.doc;
   return h('section', { class: 'card' },
     h('h2', null, 'Characters', h('span', { class: 'spacer' }),
-      h('button', { class: 'btn small', onclick: addCharacter }, '+ New')),
-    groupBy(doc.characters, c => c.folder || '').map(([folder, chars]) => [
-      folder ? h('h3', { class: 'folderhead' }, '📁 ' + folder) : null,
+      h('button', { class: 'btn small', title: 'Make a folder for a game, eg Tekken 8', onclick: addFolder }, '+ Folder'),
+      h('button', { class: 'btn small', onclick: () => addCharacter() }, '+ New')),
+    [''].concat(allFolders()).map(folder => [folder, doc.characters.filter(c => (c.folder || '') === folder)]).filter(([folder, chars]) => folder || chars.length).map(([folder, chars]) => [
+      folder ? h('h3', { class: 'folderhead' }, h('span', null, '📁 ' + folder),
+        h('button', { class: 'btn icon ghost small', title: `New character in ${folder}`, 'aria-label': `New character in ${folder}`, onclick: () => addCharacter(folder) }, '+')) : null,
+      chars.length ? null : h('p', { class: 'hint', style: 'margin:0 0 4px 8px' }, 'Empty. Click + to add a character, or drop character files into this folder and click Reload.'),
       h('ul', { class: 'charlist' }, chars.map(c => {
         const slots = doc.slots.map((s, i) => (s === keyOf(c) ? SLOT_BUTTONS[i] : null)).filter(Boolean);
         return h('li', null, h('button', {
@@ -622,13 +660,73 @@ function groupBy(items, keyOf) {
   const all = [...groups];
   return all.filter(g => g[0] === '').concat(all.filter(g => g[0] !== ''));
 }
-const allFolders = () => [...new Set(state.doc.characters.map(c => c.folder).filter(Boolean))].sort();
+const allFolders = () => [...new Set(state.doc.characters.map(c => c.folder).filter(Boolean).concat([...(state.extraFolders || [])]))]
+  .sort((a, b) => a.localeCompare(b));
 
-function addCharacter() {
-  const name = prompt('Name for the new character?', 'New character');
-  if (!name) return;
-  const folder = (currentChar() || {}).folder;
-  const c = cg.newCharacter(slugify(name, folder), name.trim(), folder);
+// Asks for a name and folder. Resolves to { name, folder } or null if cancelled
+function askNewCharacter(defaultFolder) {
+  return new Promise(resolve => {
+    const nameInput = h('input', { type: 'text', value: 'New character', required: true });
+    const folderInput = h('input', { type: 'text', value: defaultFolder || '', list: 'dialogFolders', placeholder: 'No folder', spellcheck: 'false' });
+    const error = h('span', { class: 'hint', style: 'color:var(--bad)' });
+    let done = false;
+    const finish = result => {
+      if (done) return;
+      done = true;
+      if (dlg.open) dlg.close();
+      dlg.remove();
+      resolve(result);
+    };
+    const dlg = h('dialog', { class: 'newchar' },
+      h('form', { onsubmit: e => {
+        e.preventDefault();
+        const folder = folderInput.value.trim().replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+        const err = folder ? cg.folderPathError(folder) : null;
+        if (!nameInput.value.trim()) { error.textContent = 'Give the character a name'; return; }
+        if (err) { error.textContent = `Folder name ${err}`; return; }
+        finish({ name: nameInput.value.trim(), folder });
+      } },
+      h('h3', null, 'New character'),
+      h('label', { class: 'field' }, h('span', null, 'Name'), nameInput),
+      h('label', { class: 'field' }, h('span', null, 'Folder (pick one, or type a new name to make a new folder)'), folderInput,
+        h('datalist', { id: 'dialogFolders' }, allFolders().map(f => h('option', { value: f })))),
+      error,
+      h('div', { class: 'inline', style: 'justify-content:flex-end' },
+        h('button', { class: 'btn', type: 'button', onclick: () => finish(null) }, 'Cancel'),
+        h('button', { class: 'btn primary', type: 'submit' }, 'Create'))));
+    dlg.addEventListener('close', () => finish(null)); // Esc
+    document.body.appendChild(dlg);
+    dlg.showModal();
+    nameInput.select();
+  });
+}
+
+async function addFolder() {
+  const raw = prompt('Name for the new folder (eg the game, like Tekken 8 or Soul Calibur)?', '');
+  if (raw === null) return;
+  const folder = raw.trim().replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+  const err = folder ? cg.folderPathError(folder) : 'needs a name';
+  if (err) { toast(`Folder name ${err}`, 'bad'); return; }
+  if (allFolders().some(f => f.toLowerCase() === folder.toLowerCase())) { toast(`There is already a folder called ${folder}`, 'bad'); return; }
+  state.extraFolders = state.extraFolders || new Set();
+  state.extraFolders.add(folder);
+  if (state.dir) {
+    try {
+      let d = await state.dir.getDirectoryHandle(cg.PROJECT_DIR, { create: true });
+      for (const part of folder.split('/')) d = await d.getDirectoryHandle(part, { create: true });
+      toast(`Made characters/${folder}. Click its + to add a character.`, 'ok');
+    } catch (e) { toast('Could not make the folder: ' + e.message, 'bad'); }
+  } else {
+    toast(`Added ${folder}. It will be in the zip once it has a character in it.`, 'ok');
+  }
+  render();
+}
+
+async function addCharacter(defaultFolder) {
+  const answer = await askNewCharacter(defaultFolder !== undefined ? defaultFolder : (currentChar() || {}).folder);
+  if (!answer) return;
+  const { name, folder } = answer;
+  const c = cg.newCharacter(slugify(name, folder), name, folder);
   if (!c.folder) delete c.folder;
   state.doc.characters.push(c);
   state.selected = keyOf(c);
@@ -725,18 +823,23 @@ function colourMapEditor(title, help, getMap, setMap, fallback, allowRandom, key
     changed({ render: !live, coalesce: live });
   };
   const clear = k => { const m = Object.assign({}, getMap() || {}); delete m[k]; setMap(m); changed(); };
+  const clearAll = () => { const m = getMap() || {}; setMap(m.default !== undefined ? { default: m.default } : {}); changed(); };
   const leds = state.simConfig.leds;
   const slots = cg.COLOUR_SLOTS.filter(s => leds[s] !== 0xFF || map[s] !== undefined);
+  const own = slots.filter(s => map[s] !== undefined);
   return h('div', { class: 'cmap' },
     h('h3', null, title, h('span', { class: 'hint' }, help)),
-    h('div', { class: 'inline' }, h('span', { class: 'hint' }, 'All buttons'), colourControl(def, allowRandom, (v, live) => set('default', v, live), keyPrefix + '-default')),
-    h('div', { class: 'cgrid' }, slots.map(s => {
-      const own = map[s] !== undefined;
-      return h('div', { class: 'cchip' + (own ? ' set' : ''), title: own ? `${s} has its own colour` : `${s} uses the all buttons colour. Click the swatch to give it its own.` },
+    h('div', { class: 'inline' }, h('span', { class: 'hint' }, 'All buttons'), colourControl(def, allowRandom, (v, live) => set('default', v, live), keyPrefix + '-default'),
+      own.length ? h('span', { class: 'hint' }, `${own.join(', ')} ${own.length === 1 ? 'has its' : 'have their'} own colour so ${own.length === 1 ? 'ignores' : 'ignore'} this.`) : null,
+      own.length ? h('button', { class: 'btn small', title: 'Make every button use the All buttons colour again', onclick: clearAll }, 'Reset them') : null),
+    // with the random 🎲 toggle a button needs room for swatch + 🎲 + ×, so use wider chips
+    h('div', { class: 'cgrid' + (allowRandom ? ' wide' : '') }, slots.map(s => {
+      const isOwn = map[s] !== undefined;
+      return h('div', { class: 'cchip' + (isOwn ? ' set' : ''), title: isOwn ? `${s} has its own colour. Click × to go back to the All buttons colour.` : `${s} uses the All buttons colour. Click the swatch to give it its own.` },
         h('b', null, s),
-        own ? colourControl(map[s], allowRandom, (v, live) => set(s, v, live), keyPrefix + '-' + s)
+        isOwn ? colourControl(map[s], allowRandom, (v, live) => set(s, v, live), keyPrefix + '-' + s)
           : h('button', { class: 'inherit', 'aria-label': `Give ${s} its own colour`, style: `background:${def === 'random' ? 'conic-gradient(#7fdc00,#00dcdc,#7f00dc,#ff0000,#7fdc00)' : def}`, onclick: () => set(s, def, false) }),
-        own ? h('button', { class: 'btn icon ghost small', title: 'Use the all buttons colour', 'aria-label': `Reset ${s}`, onclick: () => clear(s) }, '×') : null);
+        isOwn ? h('button', { class: 'btn icon small reset', title: 'Use the All buttons colour', 'aria-label': `Reset ${s} to the All buttons colour`, onclick: () => clear(s) }, '×') : null);
     })));
 }
 
@@ -940,17 +1043,21 @@ const sim = new SIM.KaimanaSim(SIM.DEFAULT_CONFIG);
 const canvas = h('canvas', { width: 540, height: 250, 'aria-label': 'Stick preview. Click and hold buttons, or use the keyboard.' });
 const renderer = new SIM.StickRenderer(canvas, sim);
 const detected = h('div', { class: 'detected', 'aria-live': 'polite' });
-const previewColumn = h('div', { class: 'preview-col' },
+// Shows whether the keyboard is driving the preview stick or typing into a box
+const kbStatus = h('div', { class: 'kbstatus', 'aria-live': 'polite' });
+const previewColumn = h('div', { class: 'preview-col', onpointerdown: () => { if (typing(document.activeElement)) document.activeElement.blur(); } },
   h('section', { class: 'card preview' },
     h('h2', null, 'Preview', h('span', { class: 'spacer' }), h('span', { id: 'previewName', style: 'text-transform:none;letter-spacing:0;color:var(--text)' })),
     canvas,
     detected,
+    kbStatus,
     h('div', { class: 'keys' },
       h('span', null, h('kbd', null, 'W A S D'), ' / ', h('kbd', null, '← ↑ → ↓')), h('span', null, 'Joystick'),
       h('span', null, h('kbd', null, 'U I O P')), h('span', null, 'P1 P2 P3 P4'),
       h('span', null, h('kbd', null, 'J K L ;')), h('span', null, 'K1 K2 K3 K4'),
+      h('span', null, h('kbd', null, 'V B N')), h('span', null, 'Select Start Home (shown on the stick when they have LEDs in kaimana_custom.h)'),
       h('span', null, 'Mouse'), h('span', null, 'Click and hold a button on the stick')),
-    h('p', { class: 'hint', style: 'margin:8px 0 0' }, 'Try your special moves here with the keyboard. Timings match the stick (charge needs 750ms). Click away from text boxes first.'),
+    h('p', { class: 'hint', style: 'margin:8px 0 0' }, 'Try your special moves here with the keyboard. Timings match the stick (charge needs 750ms). If a colour picker is open, close it first (click outside it), as it takes the keys while it is open.'),
     h('div', { class: 'inline', style: 'margin-top:8px' },
       h('button', { class: 'btn small', onclick: () => sim.cancelAnimation() }, 'Stop animation'),
       h('label', { class: 'inline hint' }, h('input', { type: 'checkbox', checked: true, onchange: e => { renderer.labels = e.target.checked; } }), 'Button labels'))));
@@ -972,8 +1079,34 @@ function syncPreview() {
 }
 sim.run();
 
-const typing = t => t && (t.tagName === 'INPUT' && !['checkbox', 'color', 'button'].includes(t.type) || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
+function typing(t) { return !!t && (t.tagName === 'INPUT' && !['checkbox', 'color', 'button'].includes(t.type) || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT'); }
+const inDialog = t => !!(t && t.closest && t.closest('dialog'));
+function updateKbStatus() {
+  const t = document.activeElement;
+  const busy = typing(t);
+  kbStatus.className = 'kbstatus' + (busy ? ' busy' : '');
+  kbStatus.textContent = busy
+    ? `⌨ Keys are going to the ${t.tagName === 'SELECT' ? 'drop-down' : 'box'} you're editing. Press ${t.tagName === 'TEXTAREA' ? 'Esc' : 'Enter or Esc'}, or click the preview, to use the stick.`
+    : '⌨ Keyboard controls the stick';
+}
+updateKbStatus();
+document.addEventListener('focusin', updateKbStatus);
+document.addEventListener('focusout', () => setTimeout(updateKbStatus, 0));
+// Once an option is picked, a drop-down gives the keys back to the stick (runs after the page has re-rendered)
+document.addEventListener('change', () => {
+  const t = document.activeElement;
+  if (t && t.tagName === 'SELECT' && !inDialog(t)) t.blur();
+});
 document.addEventListener('keydown', e => {
+  // Esc (or Enter in a one line box) finishes editing and gives the keys back to the stick
+  if (typing(e.target) && !inDialog(e.target) && (e.key === 'Escape' || (e.key === 'Enter' && e.target.tagName === 'INPUT'))) {
+    const key = e.target.dataset.key;
+    e.target.blur();
+    // leaving the box can commit it and re-render the page, which puts focus back on the new copy of the box
+    setTimeout(() => { const a = document.activeElement; if (a && key && a.dataset.key === key) a.blur(); }, 0);
+    if (e.key === 'Escape') e.preventDefault();
+    return;
+  }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); return; }
   if ((e.ctrlKey || e.metaKey) && !typing(e.target) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if ((e.ctrlKey || e.metaKey) && !typing(e.target) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
@@ -1002,6 +1135,7 @@ canvas.addEventListener('pointercancel', pointerUp);
 // ---------- wiring ----------
 $('saveBtn').addEventListener('click', save);
 $('undoBtn').addEventListener('click', undo);
+$('reloadBtn').addEventListener('click', reloadFromDisk);
 $('redoBtn').addEventListener('click', redo);
 $('errBtn').addEventListener('click', () => { state.showErrors = !state.showErrors; renderHeader(); });
 window.addEventListener('beforeunload', e => { if (state.dirty) { e.preventDefault(); e.returnValue = ''; } });

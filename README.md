@@ -42,7 +42,13 @@ Please read the following for information. The further you go the more advanced 
 Goto the releases section of this repro and download the latest version (currently marked as "BETA") and then unzip the contents to a suitable location.
 
 ### Arduino setup
-If you havent already. Goto the arduino website and get the latest version of the IDE and install it - <a href="https://www.arduino.cc/en/software/">Direct link</a>. Once thats done, it should have associated .ino files with the app. Open the kaimana-zero folder where you saved the contents of the dowloaded zip from the previous step and then double click on the kaimana-zero.ino file. It should have an arduino file icon. If not and it doesnt auto open then open arduino manually and open the kaimana-zero file using the menu bar (File->Open). Finally, make sure you select Leonardo as the board type, again from the menu bar (Tools->Board->Arduino AVR boards). Click the Tick button just under the menu bar to build the code for the first time. It should compile ok and report the outcome in the output window at the bottom! The button next to the Tick that is a right arrow is the Upload button. Dont use it yet, make sure you do at least the rest of this first time setup section first but once you are ready, plug the kaimana into your pc (DO NOT LEAVE IT CONNECTED TO ANYTHING ELSE OR YOU CAN SHORT IT) and then click the upload button. The output window should tell you whats happening. If it cant find the kaimana then you probably just need to alter the com port its looking for it on (It defaults to COM1). You can do this from the menu bar (Tools->Port). Just try each one until the upload works.
+- Step 1 : If you havent already, goto the arduino website and get the latest version of the IDE and install it - <a href="https://www.arduino.cc/en/software/">Direct link</a>. Once thats done, it should have associated .ino files with the app.
+- Step 2 : Open the kaimana-zero folder where you saved the contents of the downloaded zip from the previous section and double click on the kaimana-zero.ino file (it should have an arduino file icon). If it doesnt auto open then open arduino manually and open the kaimana-zero file using the menu bar (File->Open).
+- Step 3 : Select Leonardo as the board type from the menu bar (Tools->Board->Arduino AVR boards).
+- Step 4 : Click the Tick button just under the menu bar to build the code for the first time. It should compile ok and report the outcome in the output window at the bottom!
+- Step 5 : The button next to the Tick that is a right arrow is the Upload button. Dont use it yet! Make sure you do at least the rest of this first time setup section first.
+- Step 6 : Once you are ready, plug the kaimana into your pc (DO NOT LEAVE IT CONNECTED TO ANYTHING ELSE OR YOU CAN SHORT IT) and then click the Upload button. The output window should tell you whats happening.
+- Step 7 : If it cant find the kaimana then you probably just need to alter the com port its looking for it on (It defaults to COM1). You can do this from the menu bar (Tools->Port). Just try each one until the upload works.
 
 ### Setting up the code for your LED configuration
 
@@ -97,7 +103,14 @@ Next time you open the editor it will offer to reopen the same folder.
 > Using Firefox or Safari? They can't save into folders, so click **Open sketch folder** and pick the same folder. The browser can read it but not write to it, so when you save it downloads kaimana-characters.zip with just the changed files. Unzip it into the sketch folder, replacing the old files (the message after saving also lists any files to delete, eg if you renamed a character).
 
 ### Profiles on the stick
-The 8 dropdowns at the top left are the 8 profiles. Characters are grouped by folder (eg StreetFighter6). Set a character's folder at the top of its page, it's just for keeping things organised. P1 to P4 and K1 to K4 are the buttons you press to pick them after holding P1, P4, K1 and K4 (see Special Button combos). You can put the same character in more than one slot and it only takes up memory once.
+The 8 dropdowns at the top left are the 8 profiles. P1 to P4 and K1 to K4 are the buttons you press to pick them after holding P1, P4, K1 and K4 (see Special Button combos). You can put the same character in more than one slot and it only takes up memory once.
+
+### Characters and folders
+Characters are grouped into folders, eg one per game (StreetFighter6, Tekken 8, Soul Calibur). Folders are just for keeping things organised.
+- **+ Folder** makes a new folder. Folder names can use letters, numbers, spaces, _ . and -.
+- **+ New** makes a new character and asks which folder to put it in. You can pick a folder or type a new name to make one. Each folder heading also has its own **+** to make a character straight into that folder.
+- To move a character to another folder, change the **Folder** box at the top of its page.
+- Folders you make in Explorer or Finder (inside kaimana-zero/characters/) show up in the editor too, even when they are empty. If the editor is already open, click **Reload** at the top to see them.
 
 ### Look & idle
 - **Idle animation** is what plays when you're not using the stick. Here are all the idle types
@@ -132,7 +145,7 @@ Every character is saved as its own file, so they are easy to swap:
 > characters/StreetFighter6/ryu.json - one file per character. The folder it sits in is the folder shown in the editor <br />
 
 - To share a character, send someone its file (eg characters/StreetFighter6/ryu.json).
-- To add a character someone sent you, drop the file into the characters folder, or a folder inside it (make one for the game if you like, eg characters/Tekken8/), then reopen the editor. That's it.
+- To add a character someone sent you, drop the file into kaimana-zero/characters/, or a folder inside it (make one for the game if you like, eg characters/Tekken 8/), then click **Reload** in the editor (or reopen it). That's it.
 - Each character file also carries the motions it uses, so it works even if your motion library doesn't have them. If it has its own version of a motion you already have (same name, different inputs), the editor keeps both, renames the character's copy (eg QUARTERCIRCLE_RIGHT_DAVE_RYU) and tells you.
 - Characters are identified by their folder and file name together, so a Ryu someone sends you in characters/Dave/ryu.json won't replace your characters/StreetFighter6/ryu.json. Both show up in the editor and you can even have both in slots.
 - Pulling updates from the main repo only changes the characters that were actually changed there, so your edits to other characters are safe. If github says GeneratedCharacters.cpp has a conflict, don't try to fix it by hand. Just open the editor and save (or run the command below) and it will be regenerated from your characters.

@@ -63,9 +63,11 @@
 //List all buttons that have LED's on them here. NOTE: Order here specifies the idle type "Circle pulse" order. If you have leverless and a jump button where your thumb is then you should swap the positions of up and down. you may also want to move Left to the beginning of the list
 const unsigned char ledList[LED_ENTRIES] = { LED_UP, LED_RIGHT, LED_P1, LED_P2, LED_P3, LED_P4, LED_K4, LED_K3, LED_K2, LED_K1, LED_DOWN, LED_LEFT }; 
 
-//Which button to hold to enter tourney mode (turns off all lights and effects). The commented out version is an example where I dont have a home button so I want to use k4 but since thats already in ledList directly above then I set the led to shine here as 0xFF so its ignored.
+//Which button to hold to enter tourney mode (turns off all lights and effects). The commented out version is an example where I dont have a home button so I want to use k4 instead.
+//The button lights in the character's pressed/not pressed colours using its LED from the LED order section above (LED_HOME for the home button).
+//PIN_TO_SWITCH_TO_TOURNEY_MODE_LED is no longer used and is only kept so older copies of this file still compile.
 #define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_HOME
-#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED PIN_HOME
+#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED LED_HOME
 //#define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_K4
 //#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED 0xFF
 

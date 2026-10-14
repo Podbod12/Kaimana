@@ -118,10 +118,11 @@
 
   const ID_RE = /^[a-z][a-z0-9_]{0,30}$/;
 
-  // Folder names follow the Arduino sketch naming rules so a folder can always be used as a real folder under src/:
-  // start with a letter, digit or _, then letters, digits, _ . or -, at most 63 characters, not ending in a dot
-  // and not a reserved Windows name.
-  const FOLDER_RE = /^[A-Za-z0-9_][A-Za-z0-9_.-]{0,62}$/;
+  // Character folders (characters/<Folder>/) only hold JSON, which the Arduino IDE never compiles, so they just need to be
+  // safe file system names on every OS: start with a letter, digit or _, then letters, digits, spaces, _ . or -, at most
+  // 63 characters, not ending in a dot or space and not a reserved Windows name. Spaces are fine ("Soul Calibur"), the
+  // generated C++ names replace them with _.
+  const FOLDER_RE = /^[A-Za-z0-9_][A-Za-z0-9_. -]{0,62}$/;
   const RESERVED_NAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
   function folderPathError(path) {
     for (const part of path.split('/')) {
@@ -131,8 +132,8 @@
     return null;
   }
   function folderNameError(name) {
-    if (!FOLDER_RE.test(name)) return 'must start with a letter, number or _ and only use letters, numbers, _ . and - (max 63 characters)';
-    if (name.endsWith('.')) return 'cannot end with a dot';
+    if (!FOLDER_RE.test(name)) return 'must start with a letter, number or _ and only use letters, numbers, spaces, _ . and - (max 63 characters)';
+    if (name.endsWith('.') || name.endsWith(' ')) return 'cannot end with a dot or a space';
     if (RESERVED_NAMES.test(name)) return 'is a reserved Windows name';
     return null;
   }
@@ -820,7 +821,9 @@
       result.errors.forEach(e => console.error('error: ' + e));
       process.exit(1);
     }
-    fs.writeFileSync(path.join(dir, 'GeneratedCharacters.cpp'), result.code);
+    // keep the line endings the file already has (git on Windows usually checks out CRLF)
+    const existing = read('GeneratedCharacters.cpp');
+    fs.writeFileSync(path.join(dir, 'GeneratedCharacters.cpp'), existing && existing.includes('\r\n') ? result.code.replace(/\n/g, '\r\n') : result.code);
     const s = result.stats;
     console.log(`Wrote GeneratedCharacters.cpp: ${s.uniqueProfiles} unique profiles, ${s.counts.moves} moves, ${s.tableBytes} bytes of tables (estimated flash ${s.estimatedFlash}/${s.flashLimit})`);
   }

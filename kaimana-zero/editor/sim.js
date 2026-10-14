@@ -49,14 +49,47 @@
   const sub = (a, b) => (a - b) >>> 0; // unsigned long subtraction, like the firmware
 
   // Reads the LED layout from kaimana_custom.h so the preview matches the user's stick. Anything missing keeps the default.
+  // A small C preprocessor, just enough for kaimana_custom.h. Works a line at a time (a #define with no value, like
+  // "#define _LED_ORDER_FULL", must not swallow the next line) and follows #ifdef / #ifndef / #if / #else / #endif so
+  // only the settings that would really be compiled are used. Returns the defines and the text of the active lines.
+  function preprocess(text) {
+    const noComments = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const defs = {};
+    const frames = []; // { parent, taken } for each open #if
+    let active = true;
+    const kept = [];
+    const evalIf = expr => {
+      // supports defined(X), numbers, defines with number values, ! && || and brackets
+      let e = expr.replace(/defined\s*\(\s*(\w+)\s*\)|defined\s+(\w+)/g, (m, a, b) => ((a || b) in defs ? '1' : '0'));
+      e = e.replace(/\b[A-Za-z_]\w*\b/g, id => (/^(0x[0-9a-f]+|\d+)$/i.test(defs[id] || '') ? String(Number(defs[id])) : '0'));
+      if (!/^[\d\s()!&|<>=+\-*xXa-fA-F]*$/.test(e)) return true; // too clever for us, assume it is on
+      try { return !!Function('return (' + e + ')')(); } catch (err) { return true; }
+    };
+    for (const raw of noComments.split(/\r?\n/)) {
+      const line = raw.trim();
+      let m;
+      if ((m = line.match(/^#\s*ifdef\s+(\w+)/))) { frames.push({ parent: active, taken: active && m[1] in defs }); active = frames[frames.length - 1].taken; continue; }
+      if ((m = line.match(/^#\s*ifndef\s+(\w+)/))) { frames.push({ parent: active, taken: active && !(m[1] in defs) }); active = frames[frames.length - 1].taken; continue; }
+      if ((m = line.match(/^#\s*if\s+(.*)$/))) { frames.push({ parent: active, taken: active && evalIf(m[1]) }); active = frames[frames.length - 1].taken; continue; }
+      if ((m = line.match(/^#\s*elif\s+(.*)$/))) {
+        const f = frames[frames.length - 1];
+        if (f) { active = f.parent && !f.taken && evalIf(m[1]); if (active) f.taken = true; }
+        continue;
+      }
+      if (/^#\s*else\b/.test(line)) { const f = frames[frames.length - 1]; if (f) { active = f.parent && !f.taken; f.taken = true; } continue; }
+      if (/^#\s*endif\b/.test(line)) { const f = frames.pop(); active = f ? f.parent : true; continue; }
+      if (!active) continue;
+      if ((m = line.match(/^#\s*define\s+(\w+)(?:\s+(.*))?$/))) defs[m[1]] = (m[2] || '').trim();
+      else if ((m = line.match(/^#\s*undef\s+(\w+)/))) delete defs[m[1]];
+      kept.push(raw);
+    }
+    return { defs, src: kept.join('\n') };
+  }
+
   function parseConfig(text) {
     const cfg = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
     if (!text) return cfg;
-    const src = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-    const defs = {};
-    const re = /#define\s+(\w+)\s+([^\s]+)/g;
-    let m;
-    while ((m = re.exec(src))) defs[m[1]] = m[2];
+    const { defs, src } = preprocess(text);
     const num = v => (v === undefined ? undefined : (/^0x/i.test(v) ? parseInt(v, 16) : (/^\d+$/.test(v) ? parseInt(v, 10) : undefined)));
     const names = { P1: 'LED_P1', P2: 'LED_P2', P3: 'LED_P3', P4: 'LED_P4', K1: 'LED_K1', K2: 'LED_K2', K3: 'LED_K3', K4: 'LED_K4', Home: 'LED_HOME', Start: 'LED_START', Select: 'LED_SELECT', Up: 'LED_UP', Down: 'LED_DOWN', Left: 'LED_LEFT', Right: 'LED_RIGHT' };
     for (const k in names) { const v = num(defs[names[k]]); if (v !== undefined) cfg.leds[k] = v; }
@@ -511,6 +544,8 @@
       return null;
     }
     async pollSwitches() {
+      // Home is also the tourney mode button (holding it doesn't enter tourney mode in the preview)
+      this.checkButton('Home');
       this.switchHistoryBeginFrame();
       this.checkButton('Select');
       this.checkButton('Start');
@@ -646,6 +681,9 @@
           ctx.font = '600 11px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillText(b, x + 0.5, y + 0.5);
           ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText(b, x, y);
+        } else if (this.labels) {
+          ctx.font = '600 9px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillText(b, x, y + r + 5);
         }
         this.hit.push({ name: b, x, y, r: r + 3 });
       }

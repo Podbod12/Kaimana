@@ -337,25 +337,11 @@ bool pollSwitches(void)
   }
 
   // test switch and set LED based on result       // HOME = GUIDE
-  // tests if we should switch into or out of tourney mode
-  if (digitalRead(PIN_TO_SWITCH_TO_TOURNEY_MODE) == BUTTON_READ_CHECK)
+  // tests if we should switch into or out of tourney mode. If it's the home button then its LED uses the character's pressed/not
+  // pressed colours like every other button. Any other button already has its LED handled below, so 0xFF (no LED) here.
+  // (PIN_TO_SWITCH_TO_TOURNEY_MODE_LED isn't used any more as older kaimana_custom.h files set it to a pin number instead of an LED)
+  if (checkButtonPressedAndSetNewColourIfSo(PIN_TO_SWITCH_TO_TOURNEY_MODE, PIN_TO_SWITCH_TO_TOURNEY_MODE == PIN_HOME ? LED_HOME : 0xFF))
   {
-    // switch is active
-    if (PIN_TO_SWITCH_TO_TOURNEY_MODE_LED != 0xFF)
-    {
-      if (iLED[PIN_TO_SWITCH_TO_TOURNEY_MODE_LED] == true)
-      {
-        //maintain color while switch is active
-        //Add custom "when held" code here
-      }
-      else
-      {
-        // select new color when switch is first activated
-        setLEDRandomColor(LED_HOME);
-        iLED[PIN_TO_SWITCH_TO_TOURNEY_MODE_LED] = true;
-      }
-    }
-
     //Button hold to change idle animation
     holdTimeout += 1;
 
@@ -369,13 +355,6 @@ bool pollSwitches(void)
   }
   else
   {
-    // switch is inactive
-    if (LED_HOME != 0xFF)
-    {
-      kaimana.setLED(PIN_TO_SWITCH_TO_TOURNEY_MODE_LED, BLACK);
-      iLED[PIN_TO_SWITCH_TO_TOURNEY_MODE_LED] = false;
-    }
-
     holdTimeout = 0;
   }
 
