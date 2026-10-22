@@ -632,6 +632,7 @@ function renderSlots() {
 
 function renderCharacterList() {
   const doc = state.doc;
+  const sel = currentChar();
   return h('section', { class: 'card' },
     h('h2', null, 'Characters', h('span', { class: 'spacer' }),
       h('button', { class: 'btn small', title: 'Make a folder for a game, eg Tekken 8', onclick: addFolder }, '+ Folder'),
@@ -646,7 +647,11 @@ function renderCharacterList() {
           class: keyOf(c) === state.selected ? 'sel' : '',
           onclick: () => { state.selected = keyOf(c); state.expanded.clear(); state.editingMotion = null; render(); syncPreview(); },
         }, c.name || c.id, h('span', { class: 'tag' }, slots.join(' '))));
-      }))]));
+      }))]),
+    // same as the Delete button next to Duplicate, but easier to find
+    h('div', { class: 'inline', style: 'justify-content:flex-end; margin-top:8px' },
+      h('button', { class: 'btn small danger', disabled: !sel, title: sel ? `Delete ${sel.name || sel.id}` : 'Select a character first',
+        onclick: () => deleteCharacter(sel) }, 'Delete selected')));
 }
 
 // Groups items by key in first seen order, with the no folder group ('') first. Returns [[key, items], ...]

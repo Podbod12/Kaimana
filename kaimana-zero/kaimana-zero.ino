@@ -28,8 +28,18 @@
 bool pollSwitches(void);
 void setLEDRandomColor(int index);
 bool tourneypollSwitches(void);
+bool tourneyButtonHeldLongEnough(bool bHeld);
 boolean tournamentMode = false;
-int holdTimeout = 0;
+
+//older copies of kaimana_custom.h won't have this so default it to the same 5 seconds as the readme
+#ifndef TOURNEY_HOLD_MS
+  #define TOURNEY_HOLD_MS 5000
+#endif
+
+//when the tourney mode button started being held, and whether this hold has already switched mode (button must be let go before it can switch again)
+unsigned long tourneyHoldStart = 0;
+bool bTourneyHolding = false;
+bool bTourneyHoldUsed = false;
 
 //global state of all LED inputs being on or off (todo : wasteful, look into new way to store this or share with input history)
 bool iLED[LED_COUNT];
@@ -340,22 +350,14 @@ bool pollSwitches(void)
   // tests if we should switch into or out of tourney mode. If it's the home button then its LED uses the character's pressed/not
   // pressed colours like every other button. Any other button already has its LED handled below, so 0xFF (no LED) here.
   // (PIN_TO_SWITCH_TO_TOURNEY_MODE_LED isn't used any more as older kaimana_custom.h files set it to a pin number instead of an LED)
-  if (checkButtonPressedAndSetNewColourIfSo(PIN_TO_SWITCH_TO_TOURNEY_MODE, PIN_TO_SWITCH_TO_TOURNEY_MODE == PIN_HOME ? LED_HOME : 0xFF))
-  {
-    //Button hold to change idle animation
-    holdTimeout += 1;
+  bool bTourneyHeld = checkButtonPressedAndSetNewColourIfSo(PIN_TO_SWITCH_TO_TOURNEY_MODE, PIN_TO_SWITCH_TO_TOURNEY_MODE == PIN_HOME ? LED_HOME : 0xFF);
 
-    //Button hold to start tourneymode
-    if (holdTimeout == 500)
-    {
-      tournamentMode = true;
-      tourneyModeActivate();
-      return true;
-    }
-  }
-  else
+  //Button hold to start tourneymode
+  if (tourneyButtonHeldLongEnough(bTourneyHeld))
   {
-    holdTimeout = 0;
+    tournamentMode = true;
+    tourneyModeActivate();
+    return true;
   }
 
   //Do Character change
@@ -423,26 +425,42 @@ bool pollSwitches(void)
   return bSpecialFired;
 }
 
+// returns true once the tourney mode button has been held for TOURNEY_HOLD_MS. Timed with millis() so entering and exiting
+// take the same time even though the normal and tourney loops run at different speeds. Only fires once per hold so holding
+// on after switching mode doesn't switch straight back
+bool tourneyButtonHeldLongEnough(bool bHeld)
+{
+  if (!bHeld)
+  {
+    bTourneyHolding = false;
+    bTourneyHoldUsed = false;
+    return false;
+  }
+
+  if (!bTourneyHolding)
+  {
+    bTourneyHolding = true;
+    tourneyHoldStart = millis();
+  }
+
+  if (!bTourneyHoldUsed && millis() - tourneyHoldStart >= TOURNEY_HOLD_MS)
+  {
+    bTourneyHoldUsed = true;
+    return true;
+  }
+
+  return false;
+}
+
 bool tourneypollSwitches(void)
 {
   // test switch and set LED based on result       // HOME = GUIDE
-  if (!digitalRead(PIN_TO_SWITCH_TO_TOURNEY_MODE))
+  //Button hold to end tourneymode
+  if (tourneyButtonHeldLongEnough(digitalRead(PIN_TO_SWITCH_TO_TOURNEY_MODE) == BUTTON_READ_CHECK))
   {
-    //Button hold to change idle animation
-    holdTimeout += 1;
-    //Button hold to end tourneymode
-    if (holdTimeout == 1000)
-    {
-      tournamentMode = false;
-      tourneyModeDeactivate();
-      return true;
-    }
-
-    delay(10);
-  }
-  else
-  {
-    holdTimeout = 0;
+    tournamentMode = false;
+    tourneyModeDeactivate();
+    return true;
   }
 
   return false;

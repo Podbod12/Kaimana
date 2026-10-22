@@ -263,6 +263,11 @@ void tourneyModeActivate(void)
 	kaimana.setLED(LED_P1, BLACK);
 	kaimana.updateALL();
 	delay( T_DELAY );
+
+	//turn off everything else the animation didnt (directions, start, select, home)
+	kaimana.setALL(BLACK);
+	kaimana.updateALL();
+  delay( T_DELAY );
 }
 
 void tourneyModeDeactivate(void)

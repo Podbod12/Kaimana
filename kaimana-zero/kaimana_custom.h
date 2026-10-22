@@ -70,6 +70,8 @@ const unsigned char ledList[LED_ENTRIES] = { LED_UP, LED_RIGHT, LED_P1, LED_P2, 
 #define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED LED_HOME
 //#define PIN_TO_SWITCH_TO_TOURNEY_MODE PIN_K4
 //#define PIN_TO_SWITCH_TO_TOURNEY_MODE_LED 0xFF
+//How long to hold that button (in milliseconds) to enter or exit tourney mode
+#define TOURNEY_HOLD_MS 5000
 
 
 
